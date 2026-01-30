@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const MongoStore = require('connect-mongo');
 const session = require('express-session');
 require('dotenv').config();
 
@@ -19,9 +20,20 @@ app.use(cors({
 
 // 🔥 3. SESSION (ต้องอยู่ก่อน routes)
 app.use(session({
+  name: 'connect.sid',
   secret: 'mySecretKey',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: 'sessions'
+  }),
+  cookie: {
+    httpOnly: true,
+    secure: false, // true ถ้า https
+    sameSite: 'lax',  
+    maxAge: 1000 * 60 * 60 * 24 // 1 วัน
+  }
 }));
 
 // 🔥 4. routes

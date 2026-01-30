@@ -89,6 +89,7 @@ exports.login = async (req, res) => {
       id: user._id,
       email: user.email
     };
+    console.log('✅ SET SESSION LOGIN SESSION:', req.session.user);
 
     res.json({
       message: "Login success",
@@ -110,36 +111,24 @@ exports.login = async (req, res) => {
    LOGOUT
 ===================== */
 exports.logout = (req, res) => {
+  console.log('🚪 LOGOUT API HIT');    
+  console.log('📥 SESSION ID:', req.sessionID);
+  console.log('📦 SESSION:', req.session);
+
   req.session.destroy(err => {
     if (err) {
-      console.error("LOGOUT ERROR:", err);
-      return res.status(500).json({
-        message: "Logout failed"
-      });
+      return res.status(500).json({ message: 'Logout failed' });
     }
-
-    res.clearCookie("connect.sid", { path: "/" });
-
-    res.json({
-      message: "Logout success"
-    });
+    res.clearCookie('connect.sid');
+    console.log('🔥 SESSION DESTROYED');
+    res.json({ message: 'Logout success' });
   });
 };
+
 
 /* =====================
    CHECK AUTH (OPTIONAL)
 ===================== */
-exports.me = (req, res) => {
-  if (!req.session || !req.session.user) {
-    return res.status(401).json({
-      message: "Unauthorized"
-    });
-  }
-
-  res.json({
-    user: req.session.user
-  });
-};
 exports.verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -213,6 +202,23 @@ exports.resendOtp = async (req, res) => {
 
   } catch (err) {
     console.error("RESEND OTP ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// controllers/userController.js
+exports.profile = async (req, res) => {
+  try {
+    console.log('📥 SESSION:', req.session);
+    console.log('📧 EMAIL FROM SESSION:', req.session?.user?.email);
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    res.json({
+      email: req.session.user.email
+    });
+
+  } catch (err) {
+    console.error("PROFILE ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

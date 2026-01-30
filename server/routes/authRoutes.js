@@ -8,6 +8,7 @@ const {
   logout,
   verifyOtp,
   resendOtp,
+  profile
 } = require("../controllers/authController");
 
 router.post("/register", register);
@@ -16,5 +17,7 @@ router.post("/logout", logout);
 
 router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);
+
+router.get('/profile', profile);
 
 module.exports = router;

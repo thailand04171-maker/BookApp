@@ -108,7 +108,7 @@ const Login = ({ navigation }) => {
           style={styles.devButton} 
           onPress={() => navigation.navigate("Home")}
         >
-          <Text style={styles.devButtonText}>DEV: Skip</Text>
+          <Text style={styles.devButtonText}> GUEST </Text>
         </TouchableOpacity>
         
       </View>
