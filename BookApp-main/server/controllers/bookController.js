@@ -1,6 +1,6 @@
 const Book = require("../models/Book");
-const cloudinary = require("../config/cloudinary");
-
+const BookCodes = require("../models/BookCodes");
+const cloudinary = require("../../config/cloudinary");
 /**
  * ➕ Create Book
  * (ต้อง login ก่อน — ใช้ session)
@@ -71,8 +71,26 @@ exports.createBook = async (req, res) => {
 };
 
 /**
- * 📚 Get All Books
+ * 🔎 Get books owned by logged-in user from BookCodes
  */
+exports.getMyBooksFromBookCodes = async (req, res) => {
+  try {
+        console.log("SESSION:", req.session); // 👈 ใส่บรรทัดนี้
+    const userId = req.session?.user?.id || req.session?.userId || req.session?.user?._id;
+    console.log("USERID:", userId); // 👈 ใส่บรรทัดนี้
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const codes = await BookCodes.find({ user: userId })
+      .populate({ path: "bookId" })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(codes);
+  } catch (err) {
+    console.error("GET MY BOOKS FROM CODES ERROR:", err);
+    res.status(500).json({ message: "Failed to fetch user books" });
+  }
+};
+
 exports.getBooks = async (req, res) => {
   try {
     const books = await Book.find({})
@@ -150,6 +168,32 @@ exports.getDashboardData = async (req, res) => {
     });
   } catch (err) {
     console.error("DASHBOARD ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getBookBysearch = async (req, res) => {
+  try {
+    const { query } = req.params;
+    if (!query || query.trim() === "") return res.json([]);
+
+    // ตรวจสอบ session user
+       console.log("SESSION:", req.session); // 👈
+    const userId = req.session?.user?.id || req.session?.userId || req.session?.user?._id;
+    console.log("USERID:", userId); // 👈
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // หา BookCodes ของ user แล้ว populate ข้อมูลหนังสือ
+    const codes = await BookCodes.find({ user: userId }).populate("bookId").lean();
+
+    const rx = new RegExp(query, "i");
+    const matched = codes
+      .filter((c) => c.bookId && rx.test(c.bookId.title))
+      .map((c) => c.bookId);
+
+    res.json(matched);
+  } catch (err) {
+    console.error("SEARCH BOOK ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };

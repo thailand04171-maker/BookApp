@@ -22,11 +22,12 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch("http://10.0.2.2:3000/api/login", {
+      const res = await fetch("http://192.168.0.254:3000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 

@@ -17,7 +17,13 @@ const UserSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+CodeBookOwned: {
+  type: [mongoose.Schema.Types.ObjectId],
+  ref: 'books',
+  default: []
+}
+
 });
 
 module.exports = mongoose.model('users', UserSchema);
