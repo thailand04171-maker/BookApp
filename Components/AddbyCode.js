@@ -1,29 +1,48 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TextInput, TouchableOpacity, Alert } from 'react-native';
 
-const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'};
+const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 
 const AddbyCode = ({ navigation }) => {
   const [bookCode, setBookCode] = useState('');
 
-  const handleAddBook = () => {
+  const handleAddBook = async () => {
     if (bookCode.trim() === "") {
       Alert.alert("ข้อผิดพลาด", "กรุณากรอกรหัสหนังสือ");
       return;
     }
 
-    // แสดง Alert แจ้งเตือน
-    Alert.alert(
-      "สำเร็จ!",
-      "An book has been added to your library",
-      [
-        { 
-          text: "OK", 
-          onPress: () => navigation.navigate('Home', { screen: 'Main' }) 
-        }
-      ]
-    );
+    try {
+      const res = await fetch('http://10.0.2.2:3000/api/add-by-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ code: bookCode.trim() }),
+      });
+
+      const text = await res.text();
+      console.log('RAW RESPONSE:', text);
+
+      let data = null;
+      try {
+        data = JSON.parse(text);
+        console.log(data);
+        
+      } catch { }
+
+      if (!res.ok) {
+        Alert.alert("ไม่สำเร็จ", data?.message || "เพิ่มหนังสือไม่สำเร็จ");
+        return;
+      }
+
+      Alert.alert("สำเร็จ!", "เพิ่มหนังสือเข้าสู่คลังของคุณแล้ว");
+      setBookCode("");
+    } catch (err) {
+      console.log("ADD BOOK ERROR:", err);
+      Alert.alert("ผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    } 
   };
+
 
   return (
     <ImageBackground source={bgImage} style={styles.background}>

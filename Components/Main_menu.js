@@ -12,6 +12,10 @@ const Main_menu = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>My Book</Text>
           
+              {/* Search Bar ลอยด้านบน Bottom Nav */}
+              <View style={styles.searchContainer}>
+                <TextInput style={styles.searchInput} placeholder="ค้นหา" />
+              </View>
           <View style={styles.grid}>
             {/* Card หนังสือที่ 1 */}
             <TouchableOpacity 
@@ -40,10 +44,6 @@ const Main_menu = ({ navigation }) => {
         
         </ScrollView>
 
-        {/* Search Bar ลอยด้านบน Bottom Nav */}
-        <View style={styles.searchContainer}>
-          <TextInput style={styles.searchInput} placeholder="ค้นหา" />
-        </View>
 
         {/* Bottom Navigation Placeholder */}
         {/* <View style={styles.bottomNav}>

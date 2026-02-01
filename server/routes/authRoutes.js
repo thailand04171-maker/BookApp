@@ -10,6 +10,17 @@ const {
   resendOtp,
   profile
 } = require("../controllers/authController");
+const {
+  addBookByCode
+} = require("../controllers/bookController");
+
+const isAuth = (req, res, next) => {
+  console.log('SESSION USER:', req.session.user);
+  if (!req.session?.user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  next();
+};
 
 router.post("/register", register);
 router.post("/login", login);
@@ -19,5 +30,7 @@ router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);
 
 router.get('/profile', profile);
+
+router.post('/add-by-code', isAuth, addBookByCode);
 
 module.exports = router;

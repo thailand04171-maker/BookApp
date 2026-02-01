@@ -1,155 +1,49 @@
 const Book = require("../models/Book");
-const cloudinary = require("../config/cloudinary");
+const BookCode = require('../models/BookCode');
 
-/**
- * ➕ Create Book
- * (ต้อง login ก่อน — ใช้ session)
- */
-exports.createBook = async (req, res) => {
+exports.addBookByCode = async (req, res) => {
   try {
-    // 🔐 check session
-    if (!req.session.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+    const userId = req.session?.user?.id; // 🔥 เอาขึ้นบนสุด
+    const { code } = req.body;
+
+    console.log('SESSION USER:', req.session.user);
+    console.log('ADD BY USER:', userId);
+    console.log('ADD BY CODE HIT:', code);
+
+    if (!userId) {
+      return res.status(401).json({ message: 'กรุณา login' });
     }
 
-    if (!req.files?.pdf) {
-      return res.status(400).json({
-        message: "PDF file is missing",
-      });
+    if (!code) {
+      return res.status(400).json({ message: 'กรุณากรอกรหัสหนังสือ' });
     }
 
-    // 🔢 generate bookCode
-    const lastBook = await Book.findOne({ bookCode: { $exists: true } })
-      .sort({ createdAt: -1 })
-      .select("bookCode");
-
-    let nextNumber = 1;
-    if (lastBook?.bookCode) {
-      const lastNumber = parseInt(lastBook.bookCode.split("-")[1], 10);
-      if (!isNaN(lastNumber)) {
-        nextNumber = lastNumber + 1;
-      }
-    }
-
-    const bookCode = `BK-${String(nextNumber).padStart(4, "0")}`;
-
-    const coverImage = req.files?.cover
-      ? {
-          url: req.files.cover[0].path,
-          public_id: req.files.cover[0].filename,
-        }
-      : undefined; // ❗ ปล่อยให้ schema ใส่ default เอง
-
-    const book = await Book.create({
-      title: req.body.title?.trim(),
-      bookCode,
-      coverImage,
-      pdfFile: {
-        url: req.files.pdf[0].path,
-        public_id: req.files.pdf[0].filename,
+    const bookCode = await BookCode.findOneAndUpdate(
+      { code, used: false },
+      {
+        used: true,
+        user: userId,
+        usedAt: new Date(),
       },
-      addedBy: req.session.user.id,
-    });
+      { new: true }
+    );
 
-    res.status(201).json({
-      message: "Book created successfully",
-      book,
-    });
-  } catch (err) {
-    console.error("CREATE BOOK ERROR:", err);
-
-    if (err.code === 11000) {
-      return res.status(409).json({
-        message: "Book code already exists",
+    if (!bookCode) {
+      return res.status(400).json({
+        message: 'รหัสไม่ถูกต้อง หรือถูกใช้งานไปแล้ว',
       });
     }
 
-    res.status(500).json({
-      message: "Internal server error",
-    });
-  }
-};
-
-/**
- * 📚 Get All Books
- */
-exports.getBooks = async (req, res) => {
-  try {
-    const books = await Book.find({})
-      .populate("addedBy", "email") // 🔥 แสดง email คนเพิ่ม
-      .sort({ createdAt: -1 })
-      .lean();
-
-    res.json(books);
-  } catch (err) {
-    console.error("GET BOOKS ERROR 👉", err);
-    res.status(500).json({ message: "Failed to fetch books" });
-  }
-};
-
-/**
- * ❌ Delete Book
- */
-exports.deleteBook = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const book = await Book.findById(req.params.id);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
-    }
-
-    // 🖼️ delete cover
-    if (book.coverImage?.public_id) {
-      await cloudinary.uploader.destroy(book.coverImage.public_id);
-    }
-
-    // 📄 delete pdf
-    if (book.pdfFile?.public_id) {
-      await cloudinary.uploader.destroy(book.pdfFile.public_id, {
-        resource_type: "raw",
-      });
-    }
-
-    await book.deleteOne();
-
-    res.json({ message: "Book deleted successfully" });
-  } catch (err) {
-    console.error("DELETE BOOK ERROR:", err);
-    res.status(500).json({ message: "Failed to delete book" });
-  }
-};
-
-/**
- * 📊 Dashboard Data
- */
-exports.getDashboardData = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const userId = req.session.user.id;
-
-    const totalBooks = await Book.countDocuments();
-    const myBooks = await Book.countDocuments({ addedBy: userId });
-
-    // 🕒 history (เฉพาะของตัวเอง)
-    const history = await Book.find({ addedBy: userId })
-      .populate("addedBy", "email")
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select("title createdAt");
-
-    res.json({
-      totalBooks,
-      myBooks,
-      history,
+    return res.json({
+      message: 'เพิ่มหนังสือสำเร็จ',
+      book: {
+        bookId: bookCode.bookId,
+        bookTitle: bookCode.bookTitle,
+      },
     });
   } catch (err) {
-    console.error("DASHBOARD ERROR:", err);
-    res.status(500).json({ message: err.message });
+    console.error('ADD BOOK ERROR:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
+
