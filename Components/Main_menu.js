@@ -1,56 +1,90 @@
-import React from 'react';
-import { StyleSheet, Text, View, ImageBackground, Image, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  TextInput
+} from 'react-native';
 
-const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'};
+const bgImage = {
+  uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'
+};
 
 const Main_menu = ({ navigation }) => {
+
+  // ✅ Hook ต้องอยู่ตรงนี้เท่านั้น
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    fetchMyBooks();
+  }, []);
+
+  const fetchMyBooks = async () => {
+    try {
+      const res = await fetch('http://10.0.2.2:3000/api/my-books', {
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+      setBooks(data);
+    } catch (err) {
+      console.log('FETCH BOOK ERROR:', err);
+    }
+  };
+
   return (
     <ImageBackground source={bgImage} style={styles.background}>
       <View style={styles.overlay}>
-        <View style={styles.header}><Text style={styles.headerTitle}>Main Menu</Text></View>
-        
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Main Menu</Text>
+        </View>
+
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>My Book</Text>
-          
-              {/* Search Bar ลอยด้านบน Bottom Nav */}
-              <View style={styles.searchContainer}>
-                <TextInput style={styles.searchInput} placeholder="ค้นหา" />
-              </View>
-          <View style={styles.grid}>
-            {/* Card หนังสือที่ 1 */}
-            <TouchableOpacity 
-              style={styles.bookCard} 
-              onPress={() => navigation.navigate('Book_Decs', { 
-                title: "Morning Glory Flowers", 
-                image: 'https://via.placeholder.com/150' 
-              })}
-            >
-              <Image source={{uri: 'https://via.placeholder.com/150'}} style={styles.bookImage} />
-              <Text style={styles.bookText} numberOfLines={2}>Morning Glory Flowers</Text>
-            </TouchableOpacity>
 
-            {/* Card หนังสือที่ 2 */}
-            <TouchableOpacity 
-              style={styles.bookCard}
-              onPress={() => navigation.navigate('Book_Decs', { 
-                title: "The Origin of Tenjin", 
-                image: 'https://via.placeholder.com/150' 
-              })}
-            >
-              <Image source={{uri: 'https://via.placeholder.com/150'}} style={styles.bookImage} />
-              <Text style={styles.bookText} numberOfLines={2}>The Origin of Tenjin</Text>
-            </TouchableOpacity>
+          <View style={styles.searchContainer}>
+            <TextInput style={styles.searchInput} placeholder="ค้นหา" />
           </View>
-        
+
+          <View style={styles.grid}>
+            {books.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>คุณยังไม่มีหนังสือ</Text>
+
+                <TouchableOpacity onPress={() => navigation.navigate('Add')}>
+                  <Text style={styles.emptyAction}>
+                    กดเพื่อเพิ่มหนังสือเล่มแรกของคุณ
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              books.map((book) => (
+                <TouchableOpacity
+                  key={book._id}
+                  style={styles.bookCard}
+                  onPress={() =>
+                    navigation.navigate('Book_Decs', {
+                      title: book.bookTitle,
+                    })
+                  }
+                >
+                  <Image
+                    source={{ uri: 'https://via.placeholder.com/150' }}
+                    style={styles.bookImage}
+                  />
+                  <Text style={styles.bookText} numberOfLines={2}>
+                    {book.bookTitle}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
+
         </ScrollView>
-
-
-        {/* Bottom Navigation Placeholder */}
-        {/* <View style={styles.bottomNav}>
-           <TouchableOpacity style={styles.navItem}><Text style={styles.navText}>Main</Text></TouchableOpacity>
-           <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('ScanQR')}><Text style={styles.navText}>Add</Text></TouchableOpacity>
-           <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}><Text style={styles.navText}>Profile</Text></TouchableOpacity>
-        </View> */}
       </View>
     </ImageBackground>
   );
@@ -71,7 +105,25 @@ const styles = StyleSheet.create({
   searchInput: { backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 15, height: 40 },
   bottomNav: { flexDirection: 'row', backgroundColor: '#000', height: 60, alignItems: 'center' },
   navItem: { flex: 1, alignItems: 'center' },
-  navText: { color: '#fff' }
+  navText: { color: '#fff' },
+  emptyContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
+
+  emptyText: {
+    fontSize: 18,
+    color: '#555',
+  },
+
+  emptyAction: {
+    color: '#D32F2F',
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 export default Main_menu;

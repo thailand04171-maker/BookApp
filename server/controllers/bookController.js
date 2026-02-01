@@ -47,3 +47,16 @@ exports.addBookByCode = async (req, res) => {
   }
 };
 
+exports.getMyBooks = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+
+    const books = await BookCode.find({ user: userId })
+      .select('bookId bookTitle usedAt');
+
+    res.json(books);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
