@@ -19,25 +19,56 @@ const ScanQR = ({ navigation }) => {
     );
   }
 
-  // 2. ฟังก์ชันเมื่อแสกนเจอ Barcode หรือ QR Code
+  
   const handleBarCodeScanned = ({ type, data }) => {
+    if (scanned) return;
     setScanned(true);
+
     Alert.alert(
-      "สำเร็จ!",
-      `พบรหัสหนังสือ: ${data}`,
+      "พบรหัสหนังสือ",
+      data,
       [
-        { 
-          text: "OK", 
+        {
+          text: "เพิ่มหนังสือ",
           onPress: () => {
+            addBookByCode(data); // 🔥 ยิง API ตรงนี้
             setScanned(false);
-            navigation.navigate('Home', { screen: 'Main' }); // นำทางไปหน้า Main
-          } 
+          }
         },
-        { text: "แสกนใหม่", onPress: () => setScanned(false), style: "cancel" }
+        {
+          text: "แสกนใหม่",
+          onPress: () => setScanned(false),
+          style: "cancel"
+        }
       ]
     );
   };
 
+  const addBookByCode = async (code) => {
+    try {
+      const res = await fetch('http://10.0.2.2:3000/api/add-by-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // 🔥 สำคัญมาก ใช้ session
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        Alert.alert("ไม่สำเร็จ", data.message || "เพิ่มหนังสือไม่สำเร็จ");
+        return;
+      }
+
+      Alert.alert("สำเร็จ 🎉", "เพิ่มหนังสือเข้าสู่คลังแล้ว");
+      navigation.navigate('Home');
+    } catch (err) {
+      console.log('SCAN ADD BOOK ERROR:', err);
+      Alert.alert("ผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+    }
+  };
   return (
     <View style={styles.background}>
       {/* ใช้ CameraView แทน ImageBackground เพื่อให้เห็นภาพจากกล้องจริง */}
@@ -53,20 +84,20 @@ const ScanQR = ({ navigation }) => {
           <View style={styles.header}>
             <Text style={styles.headerTitle}>scan</Text>
           </View>
-          
+
           <View style={styles.scannerContainer}>
             <View style={styles.viewfinder}>
-               {/* กรอบสีแดงดีไซน์เดิมของคุณ */}
-               <View style={[styles.corner, {top: 0, left: 0, borderLeftWidth: 5, borderTopWidth: 5}]} />
-               <View style={[styles.corner, {top: 0, right: 0, borderRightWidth: 5, borderTopWidth: 5}]} />
-               <View style={[styles.corner, {bottom: 0, left: 0, borderLeftWidth: 5, borderBottomWidth: 5}]} />
-               <View style={[styles.corner, {bottom: 0, right: 0, borderRightWidth: 5, borderBottomWidth: 5}]} />
+              {/* กรอบสีแดงดีไซน์เดิมของคุณ */}
+              <View style={[styles.corner, { top: 0, left: 0, borderLeftWidth: 5, borderTopWidth: 5 }]} />
+              <View style={[styles.corner, { top: 0, right: 0, borderRightWidth: 5, borderTopWidth: 5 }]} />
+              <View style={[styles.corner, { bottom: 0, left: 0, borderLeftWidth: 5, borderBottomWidth: 5 }]} />
+              <View style={[styles.corner, { bottom: 0, right: 0, borderRightWidth: 5, borderBottomWidth: 5 }]} />
             </View>
-            
+
             <Text style={styles.scanText}>-โปรดให้ Barcode อยู่ตรงกลาง-</Text>
 
-            <TouchableOpacity 
-              style={styles.manualButton} 
+            <TouchableOpacity
+              style={styles.manualButton}
               onPress={() => navigation.navigate('AddbyCode')}>
               <Text style={styles.manualButtonText}>ใช้รหัส Code จากหนังสือแทน</Text>
             </TouchableOpacity>
@@ -88,8 +119,8 @@ const styles = StyleSheet.create({
   viewfinder: { width: 250, height: 150, position: 'relative' },
   corner: { position: 'absolute', width: 30, height: 30, borderColor: 'red' },
   scanText: { color: '#fff', marginTop: 20, fontSize: 16 },
-  manualButton: { marginTop: 40, borderBottomWidth: 1, borderBottomColor: '#fff'},
-  manualButtonText: { color: '#fff', fontSize: 16, fontWeight: '600'},
+  manualButton: { marginTop: 40, borderBottomWidth: 1, borderBottomColor: '#fff' },
+  manualButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   permissionButton: { backgroundColor: '#D32F2F', padding: 15, borderRadius: 10, marginTop: 10 }
 });
 
