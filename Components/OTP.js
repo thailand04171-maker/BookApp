@@ -45,9 +45,10 @@ const OTP = ({ navigation, route }) => {
     }
 
     try {
-      const res = await fetch("http://10.0.2.2:3000/api/verify-otp", {
+      const res = await fetch("http://10.0.2.2:3000/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ email, otp: otpCode }),
       });
 
@@ -67,9 +68,10 @@ const OTP = ({ navigation, route }) => {
   // ✅ RESEND OTP
   const handleResend = async () => {
     try {
-      await fetch("http://10.0.2.2:3000/api/resend-otp", {
+      await fetch("http://10.0.2.2:3000/api/auth/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ email }),
       });
 

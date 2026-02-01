@@ -13,4 +13,4 @@ npx expo install expo-camera
 2.npm run android
 
 //ถ้ายังไม่เคยติดตั้ง 
-npm i express mongoose dotenv bcrypt cloudinary nodemailer express-session cors connect-mongo@5
+npm i express mongoose dotenv bcrypt cloudinary nodemailer express-session cors connect-mongo@5 multer

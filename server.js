@@ -37,7 +37,9 @@ app.use(session({
 }));
 
 // 🔥 4. routes
-app.use('/api', require('./server/routes/authRoutes'));
+app.use('/api/auth', require('./server/routes/authRoutes'));
+app.use('/api/books', require('./server/routes/bookRoutes'));
+
 
 // 🔥 5. connect DB
 connectDB();

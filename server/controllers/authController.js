@@ -31,7 +31,8 @@ exports.register = async (req, res) => {
     const user = await User.create({
       email,
       password: hashedPassword,
-      isVerified: false
+      isVerified: false,
+      CodeBookOwned: []
     });
 
     /* 5️⃣ generate OTP */
