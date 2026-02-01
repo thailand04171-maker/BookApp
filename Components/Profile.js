@@ -6,6 +6,8 @@ const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-boo
 
 const Profile = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [bookCount, setBookCount] = useState(0);
+
 
   const handleLogout = async () => {
 
@@ -38,13 +40,16 @@ const Profile = ({ navigation }) => {
     fetch('http://10.0.2.2:3000/api/profile', {
       method: 'GET',
       credentials: 'include',
-
     })
       .then(async res => {
         if (!res.ok) throw new Error('Unauthorized');
 
         const data = await res.json();
+        console.log('PROFILE RESPONSE:', data);
         setEmail(data.email);
+        setBookCount(data.bookCount);
+        console.log(data.bookCount);//undefined
+        
       })
       .catch(() => { //** เอาออกไปก่อนอยากทำระบบ Guest เพิ่ม --> ถ้ามี Guest เข้าไม่ได้ โดนเด้ง */
         // 🔥 ถ้า session หาย → เด้งออก 
@@ -66,8 +71,7 @@ const Profile = ({ navigation }) => {
           </View>
           <View style={styles.infoBox}>
             <Text>{email || "ไม่มีชื่อ"}</Text>
-            <Text>Books owned: 152</Text>
-            <Text>Favorite Books: 23</Text>
+            <Text>Books owned: {bookCount || "ไม่มีหนังสือ"}</Text>
             <TouchableOpacity style={styles.editBtn}><Text>แก้ไขโปรไฟล์</Text></TouchableOpacity>
             <TouchableOpacity style={styles.editBtn} onPress={handleLogout}>
               <Text>ออกจากระบบ</Text>

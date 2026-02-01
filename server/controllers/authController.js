@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const Otp = require("../models/Otp");
 const sendOtpEmail = require("../utils/sendOtpEmail");
+const BookCode = require('../models/BookCode');
 
 
 exports.register = async (req, res) => {
@@ -111,7 +112,7 @@ exports.login = async (req, res) => {
    LOGOUT
 ===================== */
 exports.logout = (req, res) => {
-  console.log('🚪 LOGOUT API HIT');    
+  console.log('🚪 LOGOUT API HIT');
   console.log('📥 SESSION ID:', req.sessionID);
   console.log('📦 SESSION:', req.session);
 
@@ -209,14 +210,22 @@ exports.resendOtp = async (req, res) => {
 exports.profile = async (req, res) => {
   try {
     console.log('📥 SESSION:', req.session);
-    console.log('📧 EMAIL FROM SESSION:', req.session?.user?.email);
+
     if (!req.session || !req.session.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    res.json({
-      email: req.session.user.email
+
+    const user = req.session.user;
+
+    const bookCount = await BookCode.countDocuments({
+      user: user.id,   // 🔥 ใช้ id จาก session
+      used: true,
     });
 
+    res.json({
+      email: user.email,
+      bookCount,
+    });
   } catch (err) {
     console.error("PROFILE ERROR:", err);
     res.status(500).json({ message: "Server error" });
