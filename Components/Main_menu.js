@@ -15,10 +15,15 @@ const bgImage = {
 };
 
 const Main_menu = ({ navigation }) => {
-
+  const [searchText, setSearchText] = useState('');
   // ✅ Hook ต้องอยู่ตรงนี้เท่านั้น
   const [books, setBooks] = useState([]);
 
+  const filteredBooks = books.filter(book =>
+    book.bookTitle
+      .toLowerCase()
+      .includes(searchText.toLowerCase())
+  );
   useEffect(() => {
     fetchMyBooks();
   }, []);
@@ -47,11 +52,16 @@ const Main_menu = ({ navigation }) => {
           <Text style={styles.title}>My Book</Text>
 
           <View style={styles.searchContainer}>
-            <TextInput style={styles.searchInput} placeholder="ค้นหา" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="ค้นหาหนังสือ"
+              value={searchText}
+              onChangeText={setSearchText}
+            />
           </View>
 
           <View style={styles.grid}>
-            {books.length === 0 ? (
+            {filteredBooks.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>คุณยังไม่มีหนังสือ</Text>
 
@@ -62,7 +72,7 @@ const Main_menu = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             ) : (
-              books.map((book) => (
+              filteredBooks.map((book) => (
                 <TouchableOpacity
                   key={book._id}
                   style={styles.bookCard}
