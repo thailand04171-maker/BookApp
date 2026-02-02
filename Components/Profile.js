@@ -10,7 +10,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
 
     try {
-      const res = await fetch('http://10.0.2.2:3000/api/logout', {
+      const res = await fetch('http://10.0.2.2:3000/api/auth/logout', {
         method: 'POST',
         credentials: 'include', // 🔥 ส่ง session cookie
       });
