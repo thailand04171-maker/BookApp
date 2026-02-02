@@ -21,17 +21,29 @@ const OTP = ({ navigation, route }) => {
 
   const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
-    newOtp[index] = text;
+    
+    // 1. Update the value (this allows deletion to happen)
+    newOtp[index] = text.slice(-1); 
     setOtp(newOtp);
 
-    if (text && index < 5) {
+    // 2. Move FORWARD only if a number was added
+    if (text !== "" && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };
 
   const handleKeyPress = ({ nativeEvent }, index) => {
-    if (nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+    // 3. This catches the Backspace when the box is ALREADY empty
+    if (nativeEvent.key === "Backspace") {
+      if (otp[index] === "" && index > 0) {
+        // Jump focus back
+        inputRefs.current[index - 1].focus();
+        // OPTIONAL: If you want it to also delete the number in the previous box 
+        // immediately when it jumps back, uncomment the lines below
+        const newOtp = [...otp];
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+      }
     }
   };
 
@@ -93,16 +105,21 @@ const OTP = ({ navigation, route }) => {
 
             <View style={styles.otpContainer}>
               {otp.map((digit, index) => (
+                
                 <TextInput
                   key={index}
                   style={styles.otpInput}
                   value={digit}
                   onChangeText={(text) => handleOtpChange(text, index)}
-                  keyboardType="numeric"
-                  maxLength={1}
-                  ref={(ref) => (inputRefs.current[index] = ref)}
                   onKeyPress={(e) => handleKeyPress(e, index)}
+                  
+                  // ADD THESE TWO:
+                  keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                  maxLength={1} 
+                  
+                  ref={(ref) => (inputRefs.current[index] = ref)}
                 />
+  
               ))}
             </View>
 
