@@ -9,6 +9,9 @@ const connectDB = require('./config/db');
 
 const app = express();
 
+// Trust proxy is required for secure cookies on Render (HTTPS)
+app.set('trust proxy', 1);
+
 // 🔥 1. middleware แปลง json
 app.use(express.json());
 
@@ -30,7 +33,7 @@ app.use(session({
   }),
   cookie: {
     httpOnly: true,
-    secure: false, // true ถ้า https
+    secure: true, // true สำหรับ https://bookapp-h41h.onrender.com
     sameSite: 'lax',  
     maxAge: 1000 * 60 * 60 * 24 // 1 วัน
   }
@@ -42,6 +45,7 @@ app.use('/api', require('./server/routes/authRoutes'));
 // 🔥 5. connect DB
 connectDB();
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
