@@ -12,7 +12,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
 
     try {
-      const res = await fetch('http://10.0.2.2:3000/api/logout', {
+      const res = await fetch('https://bookapp-h41h.onrender.com/api/logout', {
         method: 'POST',
         credentials: 'include', // 🔥 ส่ง session cookie
       });
@@ -37,7 +37,7 @@ const Profile = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetch('http://10.0.2.2:3000/api/profile', {
+    fetch('https://bookapp-h41h.onrender.com/api/profile', {
       method: 'GET',
       credentials: 'include',
     })

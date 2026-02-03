@@ -13,7 +13,7 @@ const AddbyCode = ({ navigation }) => {
     }
 
     try {
-      const res = await fetch('http://10.0.2.2:3000/api/add-by-code', {
+      const res = await fetch('https://bookapp-h41h.onrender.com/api/add-by-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
