@@ -18,6 +18,13 @@ npx expo install react-native-webview
 
 //ถ้ายังไม่เคยติดตั้ง 
 npm i express mongoose dotenv bcrypt cloudinary nodemailer express-session cors connect-mongo@5 multer
+
+
+REFLEX
+1.Login ได้แม้ไม่ยืนยัน OTP
+2.Register ไม่เด้งไปหน้า OTP 
+3.กรอกหนังสือแล้วต้อง logout ก่อนถึงขึ้นหนังสือ
+4.หน้าProfileไม่ขึ้นข้อมูลผู้ใช้
 ```
 app tt
 ├─ App.js
