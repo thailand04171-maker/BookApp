@@ -92,8 +92,8 @@ const Main_menu = ({ navigation }) => {
                       navigation.navigate('Book_Decs', {
                         title: book.bookTitle,
                         image: imageUrl, 
-                        description: book.bookId?.description || "ไม่มีรายละเอียด",
-                        pdfUrl: book.bookId?.pdf?.secure_url || book.bookId?.pdf?.url, // 🔥 ใช้ secure_url สำหรับ Cloudinary Raw (HTTPS)
+                        description: book.bookId?.detail || "ไม่มีรายละเอียด", // 🔥 แก้ไข: ดึงจาก field 'detail' ตาม JSON
+                        pdfUrl: book.bookId?.pdfFile?.url, // 🔥 แก้ไข: ดึงจาก field 'pdfFile.url' ตาม JSON
                       })
                     }
                   >
