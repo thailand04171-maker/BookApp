@@ -10,6 +10,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  profilePic: {
+    type: String,
+    default: 'https://via.placeholder.com/150' 
+  },
   isVerified: {
     type: Boolean,
     default: false

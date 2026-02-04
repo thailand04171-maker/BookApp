@@ -22,6 +22,7 @@
     "dotenv": "^17.2.3",
     "expo": "~54.0.31",
     "expo-camera": "~17.0.10",
+    "expo-image-picker": "~17.0.10",
     "expo-status-bar": "~3.0.9",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
