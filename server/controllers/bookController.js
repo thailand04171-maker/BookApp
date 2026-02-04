@@ -26,7 +26,7 @@ exports.addBookByCode = async (req, res) => {
         usedAt: new Date(),
       },
       { new: true }
-    );
+    ).populate('bookId'); // 🔥 Populate เพื่อดึงข้อมูลรูปและ PDF ทันที
 
     if (!bookCode) {
       return res.status(400).json({
@@ -60,4 +60,3 @@ exports.getMyBooks = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-

@@ -92,6 +92,8 @@ const Main_menu = ({ navigation }) => {
                       navigation.navigate('Book_Decs', {
                         title: book.bookTitle,
                         image: imageUrl, 
+                        description: book.bookId?.description || "ไม่มีรายละเอียด",
+                        pdfUrl: book.bookId?.pdf?.url, // ส่ง URL ของ PDF (Cloudinary) ไปด้วย
                       })
                     }
                   >
