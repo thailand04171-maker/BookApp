@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground, Dimensions, ActivityIndicator, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Pdf from 'react-native-pdf'; // 🔥 ต้องติดตั้ง: npm install react-native-pdf react-native-blob-util
+import { WebView } from 'react-native-webview'; // 🔥 ต้องติดตั้ง: npx expo install react-native-webview
 
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'};
 
@@ -36,19 +36,15 @@ const Reader = ({ route, navigation }) => {
           {/* Book Content - ตัวอักษรสีขาวบนพื้นหลังเข้ม */}
           <View style={styles.pdfContainer}>
             {pdfUrl ? (
-              <Pdf
-                trustAllCerts={false}
-                source={{ uri: pdfUrl, cache: true }}
-                onLoadComplete={(numberOfPages, filePath) => {
-                  setTotalPage(numberOfPages);
-                }}
-                onPageChanged={(page, numberOfPages) => {
-                  setCurrentPage(page);
-                }}
-                onError={(error) => {
-                  console.log("PDF ERROR:", error);
+              <WebView
+                source={{ 
+                  uri: Platform.OS === 'android' 
+                    ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`
+                    : pdfUrl 
                 }}
                 style={styles.pdf}
+                startInLoadingState={true}
+                renderLoading={() => <ActivityIndicator size="large" color="#D32F2F" style={{marginTop: 20}} />}
               />
             ) : (
               <View style={styles.centerMsg}>
@@ -62,11 +58,7 @@ const Reader = ({ route, navigation }) => {
           <View style={styles.bottomControl}>
             <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>◀</Text></TouchableOpacity>
             <View style={styles.pageIndicatorContainer}>
-              <Text style={styles.pageIndicatorText}>{currentPage} / {totalPage || '--'}</Text>
-              {/* Progress Bar คำนวณความกว้างตามหน้า */}
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${(currentPage / (totalPage || 1)) * 100}%` }]} />
-              </View>
+              <Text style={styles.pageIndicatorText}>PDF Viewer</Text>
             </View>
             <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>▶</Text></TouchableOpacity>
           </View>
