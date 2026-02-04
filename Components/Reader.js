@@ -1,11 +1,14 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground, Dimensions, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import Pdf from 'react-native-pdf'; // 🔥 ต้องติดตั้ง: npm install react-native-pdf react-native-blob-util
 
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'};
 
 const Reader = ({ route, navigation }) => {
-  const { title } = route.params || { title: "กำลังอ่าน..." };
+  const { title, pdfUrl } = route.params || { title: "กำลังอ่าน...", pdfUrl: null };
+  const [totalPage, setTotalPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   return (
     <ImageBackground source={bgImage} style={styles.background}>
@@ -31,32 +34,39 @@ const Reader = ({ route, navigation }) => {
           </View>
 
           {/* Book Content - ตัวอักษรสีขาวบนพื้นหลังเข้ม */}
-          <ScrollView contentContainerStyle={styles.readArea} showsVerticalScrollIndicator={false}>
-            <Text style={styles.pageTitle}>{title}</Text>
-            <View style={styles.textUnderline} />
-            
-            <Text style={styles.bookContent}>
-              กาลครั้งหนึ่งนานมาแล้ว... ณ ใจกลางห้องสมุดเวทมนตร์ 
-              เนื้อหาที่ออเจ้ากำลังอ่านอยู่นี้ถูกดึงมาจากระบบ E-book ลับ
-              {"\n\n"}
-              การออกแบบใหม่นี้ใช้ตัวอักษรสีขาว (White Contrast) บนพื้นหลังห้องสมุดที่ปรับให้มืดลง 
-              เพื่อให้ความรู้สึกเหมือนออเจ้ากำลังนั่งอ่านหนังสืออยู่ในมุมมืดของห้องสมุดจริงๆ 
-              ซึ่งจะเข้ากับหน้า Welcome และ Login ที่เราทำมาก่อนหน้านี้ที่สุด
-              {"\n\n"}
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, 
-              quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-              {"\n\n"}
-              (เนื้อหาหน้าที่ 1/100)
-            </Text>
-          </ScrollView>
+          <View style={styles.pdfContainer}>
+            {pdfUrl ? (
+              <Pdf
+                trustAllCerts={false}
+                source={{ uri: pdfUrl, cache: true }}
+                onLoadComplete={(numberOfPages, filePath) => {
+                  setTotalPage(numberOfPages);
+                }}
+                onPageChanged={(page, numberOfPages) => {
+                  setCurrentPage(page);
+                }}
+                onError={(error) => {
+                  console.log("PDF ERROR:", error);
+                }}
+                style={styles.pdf}
+              />
+            ) : (
+              <View style={styles.centerMsg}>
+                <Text style={styles.errorText}>ไม่พบไฟล์ PDF หรือกำลังโหลด...</Text>
+                <ActivityIndicator size="large" color="#D32F2F" style={{marginTop: 20}} />
+              </View>
+            )}
+          </View>
 
           {/* Bottom Control - ดีไซน์แบบลอย (Floating) */}
           <View style={styles.bottomControl}>
             <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>◀</Text></TouchableOpacity>
             <View style={styles.pageIndicatorContainer}>
-              <Text style={styles.pageIndicatorText}>1 / 100</Text>
-              <View style={styles.progressBar}><View style={styles.progressFill} /></View>
+              <Text style={styles.pageIndicatorText}>{currentPage} / {totalPage || '--'}</Text>
+              {/* Progress Bar คำนวณความกว้างตามหน้า */}
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${(currentPage / (totalPage || 1)) * 100}%` }]} />
+              </View>
             </View>
             <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>▶</Text></TouchableOpacity>
           </View>

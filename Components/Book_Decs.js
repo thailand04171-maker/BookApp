@@ -5,9 +5,11 @@ const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-boo
 
 const Book_Decs = ({ route, navigation }) => {
   // รับข้อมูลหนังสือจากหน้าที่กดมา (ถ้ามี)
-  const { title, image } = route.params || { 
+  const { title, image, description, pdfUrl } = route.params || { 
     title: "Morning Glory Flowers", 
-    image: 'https://via.placeholder.com/250x350' 
+    image: 'https://via.placeholder.com/250x350',
+    description: "ไม่มีรายละเอียด",
+    pdfUrl: null
   };
 
   return (
@@ -36,16 +38,14 @@ const Book_Decs = ({ route, navigation }) => {
             
             <Text style={styles.descriptionTitle}>เรื่องย่อ</Text>
             <Text style={styles.descriptionText}>
-              นี่คือหนังสือหายากที่รวบรวมภาพวาดดอกมอร์นิ่งกลอรี่จากยุคเอโดะ 
-              ซึ่งแสดงถึงความรุ่งเรืองของศิลปะและวัฒนธรรมญี่ปุ่นในสมัยนั้น...
-              (ออเจ้าสามารถเพิ่มเนื้อหาจริงได้ตรงนี้ครับ)
+              {description}
             </Text>
           </View>
 
           {/* Read Button */}
           <TouchableOpacity 
             style={styles.readButton}
-            onPress={() => navigation.navigate('Reader', { title: title })} // แก้ไขตรงนี้
+            onPress={() => navigation.navigate('Reader', { title: title, pdfUrl: pdfUrl })} // ส่ง pdfUrl ไปหน้า Reader
             >
             <Text style={styles.readButtonText}>อ่าน E-book</Text>
             </TouchableOpacity>

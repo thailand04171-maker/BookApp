@@ -8,6 +8,7 @@ npm install @react-naviga
 npx expo install expo-camera
 npm install react-native-image-picker
 npm audit fix
+npm install react-native-pdf react-native-blob-util
 
 //ตอนรัน ต้องใช้ 2 terminal 
 1.node server.js
