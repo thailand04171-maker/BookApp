@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   headerTitle: { color: '#ccc', fontSize: 14, textAlign: 'center', fontWeight: '500' },
   settingsBtn: { padding: 5 },
   settingsText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  pdfContainer: { flex: 1, marginBottom: 100 }, // 🔥 ให้ WebView มีพื้นที่และไม่ถูกปุ่มด้านล่างบัง
   readArea: { padding: 25, paddingBottom: 100 },
   pageTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 10 },
   textUnderline: { height: 3, width: 60, backgroundColor: '#D32F2F', marginBottom: 25 }, // เส้นสีแดงเอกลักษณ์ของแอปเรา

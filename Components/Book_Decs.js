@@ -43,12 +43,14 @@ const Book_Decs = ({ route, navigation }) => {
           </View>
 
           {/* Read Button */}
-          <TouchableOpacity 
-            style={styles.readButton}
-            onPress={() => navigation.navigate('Reader', { title: title, pdfUrl: pdfUrl })} // ส่ง pdfUrl ไปหน้า Reader
-            >
-            <Text style={styles.readButtonText}>อ่าน E-book</Text>
-            </TouchableOpacity>
+          {pdfUrl && (
+            <TouchableOpacity 
+              style={styles.readButton}
+              onPress={() => navigation.navigate('Reader', { title: title, pdfUrl: pdfUrl })} // ส่ง pdfUrl ไปหน้า Reader
+              >
+              <Text style={styles.readButtonText}>อ่าน E-book</Text>
+              </TouchableOpacity>
+          )}
         </ScrollView>
       </View>
     </ImageBackground>
