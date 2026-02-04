@@ -35,7 +35,12 @@ const Main_menu = ({ navigation }) => {
       });
 
       const data = await res.json();
-      setBooks(data);
+      console.log("My Books Data:", JSON.stringify(data, null, 2)); // 🔥 เช็คข้อมูลที่ได้จาก API ใน Terminal
+      if (Array.isArray(data)) {
+        setBooks(data);
+      } else {
+        setBooks([]);
+      }
     } catch (err) {
       console.log('FETCH BOOK ERROR:', err);
     }
@@ -72,26 +77,34 @@ const Main_menu = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             ) : (
-              filteredBooks.map((book) => (
-                <TouchableOpacity
-                  key={book._id}
-                  style={styles.bookCard}
-                  onPress={() =>
-                    navigation.navigate('Book_Decs', {
-                      title: book.bookTitle,
-                      image: book.coverImage, // 🔥 ส่งรูปภาพไปหน้า Detail
-                    })
-                  }
-                >
-                  <Image
-                    source={{ uri: book.coverImage || 'https://via.placeholder.com/150' }} // 🔥 แสดงรูปจาก DB (ถ้าไม่มีใช้รูปแทน)
-                    style={styles.bookImage}
-                  />
-                  <Text style={styles.bookText} numberOfLines={2}>
-                    {book.bookTitle}
-                  </Text>
-                </TouchableOpacity>
-              ))
+              filteredBooks.map((book) => {
+                // 🔥 ตรวจสอบว่ามี URL และเป็น http หรือไม่ (ป้องกัน path แบบ relative เช่น /images/...)
+                const rawUrl = book.bookId?.coverImage?.url;
+                const imageUrl = (rawUrl && rawUrl.startsWith('http')) 
+                  ? rawUrl 
+                  : 'https://via.placeholder.com/150';
+
+                return (
+                  <TouchableOpacity
+                    key={book._id}
+                    style={styles.bookCard}
+                    onPress={() =>
+                      navigation.navigate('Book_Decs', {
+                        title: book.bookTitle,
+                        image: imageUrl, 
+                      })
+                    }
+                  >
+                    <Image
+                      source={{ uri: imageUrl }}
+                      style={styles.bookImage}
+                    />
+                    <Text style={styles.bookText} numberOfLines={2}>
+                      {book.bookTitle}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })
             )}
           </View>
 
