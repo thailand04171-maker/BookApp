@@ -93,7 +93,7 @@ const Main_menu = ({ navigation }) => {
                         title: book.bookTitle,
                         image: imageUrl, 
                         description: book.bookId?.description || "ไม่มีรายละเอียด",
-                        pdfUrl: book.bookId?.pdf?.url, // ส่ง URL ของ PDF (Cloudinary) ไปด้วย
+                        pdfUrl: book.bookId?.pdf?.secure_url || book.bookId?.pdf?.url, // 🔥 ใช้ secure_url สำหรับ Cloudinary Raw (HTTPS)
                       })
                     }
                   >

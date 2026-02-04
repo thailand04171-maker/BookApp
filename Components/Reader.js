@@ -42,7 +42,7 @@ const Reader = ({ route, navigation }) => {
                     ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`
                     : pdfUrl 
                 }}
-                style={styles.pdf}
+                style={{ flex: 1, backgroundColor: 'transparent' }}
                 startInLoadingState={true}
                 renderLoading={() => <ActivityIndicator size="large" color="#D32F2F" style={{marginTop: 20}} />}
               />
