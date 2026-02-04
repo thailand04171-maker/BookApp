@@ -79,11 +79,12 @@ const Main_menu = ({ navigation }) => {
                   onPress={() =>
                     navigation.navigate('Book_Decs', {
                       title: book.bookTitle,
+                      image: book.coverImage, // 🔥 ส่งรูปภาพไปหน้า Detail
                     })
                   }
                 >
                   <Image
-                    source={{ uri: 'https://via.placeholder.com/150' }}
+                    source={{ uri: book.coverImage || 'https://via.placeholder.com/150' }} // 🔥 แสดงรูปจาก DB (ถ้าไม่มีใช้รูปแทน)
                     style={styles.bookImage}
                   />
                   <Text style={styles.bookText} numberOfLines={2}>
