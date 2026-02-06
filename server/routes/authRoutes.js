@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const BookCode = require("../models/BookCode");
+const upload = require("../middlewares/upload");
 
 // ✅ import logout มาด้วย
 const {
@@ -9,7 +10,8 @@ const {
   logout,
   verifyOtp,
   resendOtp,
-  profile
+  profile,
+  uploadProfilePic
 } = require("../controllers/authController");
 const {
   addBookByCode,
@@ -32,6 +34,18 @@ router.post("/resend-otp", resendOtp);
 router.get('/profile', profile);
 
 router.post('/add-by-code', isAuth, addBookByCode);
+router.post(
+  "/upload-profile-pic",
+  isAuth,
+  upload.single("profilePic"),
+  (req, res, next) => {
+    console.log("SESSION:", req.session);
+    console.log("FILE:", req.file);
+    next();
+  },
+  uploadProfilePic
+);
+
 
 // ✅ แก้ไข: เขียน Logic ตรงนี้เพื่อให้ populate bookId ได้ชัวร์ (แก้ปัญหา bookId เป็น null/string)
 router.get('/my-books', isAuth, async (req, res) => {

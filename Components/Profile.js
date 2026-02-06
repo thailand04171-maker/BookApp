@@ -59,13 +59,13 @@ const Profile = ({ navigation }) => {
     });
 
     try {
-      const res = await fetch(`${API_BASE}/upload-profile-pic`, {
+      const res = await fetch(`https://bookapp-h41h.onrender.com/api/upload-profile-pic`, {
         method: 'POST',
         body: formData,
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
         },
+        credentials: 'include',
       });
 
       const responseData = await res.json();
@@ -88,7 +88,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`${API_BASE}/logout`, { method: 'POST' });
+      const res = await fetch(`https://bookapp-h41h.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -100,13 +100,13 @@ const Profile = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/profile`)
+    fetch(`https://bookapp-h41h.onrender.com/api/profile`, { credentials: 'include' })
       .then(async res => {
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
         setEmail(data.email);
         setBookCount(data.bookCount || 0);
-        if (data.profilePic) setProfileImage(data.profilePic); 
+        if (data.profilePic) setProfileImage(data.profilePic);
       })
       .catch(err => {
         console.log("Fetch Profile Error:", err.message);

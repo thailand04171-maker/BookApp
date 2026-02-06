@@ -2,8 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const Otp = require("../models/Otp");
 const sendOtpEmail = require("../utils/sendOtpEmail");
-const BookCode = require('../models/BookCode');
-
+const BookCode = require("../models/BookCode");
 
 exports.register = async (req, res) => {
   try {
@@ -67,43 +66,49 @@ exports.login = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Email and password are required"
+        message: "Email and password are required",
       });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
-        message: "Invalid email or password"
+        message: "Invalid email or password",
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({
-        message: "Invalid email or password"
+        message: "Invalid email or password",
+      });
+    }
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: "Please verify OTP before login",
       });
     }
 
     // 🔥 SET SESSION
     req.session.user = {
       id: user._id,
-      email: user.email
+      email: user.email,
+      profilePic: user.profilePic || null,
     };
-    console.log('✅ SET SESSION LOGIN SESSION:', req.session.user);
+    console.log("✅ SET SESSION LOGIN SESSION:", req.session.user);
 
     res.json({
       message: "Login success",
       user: {
         id: user._id,
-        email: user.email
-      }
+        email: user.email,
+        profilePic: user.profilePic || null,
+      },
     });
-
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
     });
   }
 };
@@ -112,20 +117,19 @@ exports.login = async (req, res) => {
    LOGOUT
 ===================== */
 exports.logout = (req, res) => {
-  console.log('🚪 LOGOUT API HIT');
-  console.log('📥 SESSION ID:', req.sessionID);
-  console.log('📦 SESSION:', req.session);
+  console.log("🚪 LOGOUT API HIT");
+  console.log("📥 SESSION ID:", req.sessionID);
+  console.log("📦 SESSION:", req.session);
 
-  req.session.destroy(err => {
+  req.session.destroy((err) => {
     if (err) {
-      return res.status(500).json({ message: 'Logout failed' });
+      return res.status(500).json({ message: "Logout failed" });
     }
-    res.clearCookie('connect.sid');
-    console.log('🔥 SESSION DESTROYED');
-    res.json({ message: 'Logout success' });
+    res.clearCookie("connect.sid");
+    console.log("🔥 SESSION DESTROYED");
+    res.json({ message: "Logout success" });
   });
 };
-
 
 /* =====================
    CHECK AUTH (OPTIONAL)
@@ -167,7 +171,6 @@ exports.verifyOtp = async (req, res) => {
     console.log("✅ OTP verified successfully for:", email);
 
     res.json({ message: "OTP verified successfully" });
-
   } catch (err) {
     console.error("VERIFY OTP ERROR:", err);
     res.status(500).json({ message: "Server error" });
@@ -191,7 +194,7 @@ exports.resendOtp = async (req, res) => {
     await Otp.create({
       userId: user._id,
       otp: newOtp,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     });
 
     console.log("🔁 Resent OTP:", newOtp);
@@ -200,7 +203,6 @@ exports.resendOtp = async (req, res) => {
     await sendOtpEmail(email, newOtp);
 
     res.json({ message: "OTP resent successfully" });
-
   } catch (err) {
     console.error("RESEND OTP ERROR:", err);
     res.status(500).json({ message: "Server error" });
@@ -209,7 +211,7 @@ exports.resendOtp = async (req, res) => {
 // controllers/userController.js
 exports.profile = async (req, res) => {
   try {
-    console.log('📥 SESSION:', req.session);
+    console.log("📥 SESSION:", req.session);
 
     if (!req.session || !req.session.user) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -218,16 +220,43 @@ exports.profile = async (req, res) => {
     const user = req.session.user;
 
     const bookCount = await BookCode.countDocuments({
-      user: user.id,   // 🔥 ใช้ id จาก session
+      user: user.id, // 🔥 ใช้ id จาก session
       used: true,
     });
 
     res.json({
       email: user.email,
       bookCount,
+      profilePic: user.profilePic || null,
     });
   } catch (err) {
     console.error("PROFILE ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.uploadProfilePic = async (req, res) => {
+  try {
+    if (!req.session?.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const user = await User.findById(req.session.user.id);
+
+    user.profilePic = `/uploads/${req.file.filename}`;
+    await user.save();
+
+    res.json({
+      message: "Profile picture updated",
+      profilePic: user.profilePic,
+    });
+  } catch (err) {
+    console.error("UPLOAD PROFILE PIC ERROR:", err);
+    res.status(500).json({ message: "Upload failed" });
+  }
+};
+

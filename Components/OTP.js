@@ -21,29 +21,17 @@ const OTP = ({ navigation, route }) => {
 
   const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
-    
-    // 1. Update the value (this allows deletion to happen)
-    newOtp[index] = text.slice(-1); 
+    newOtp[index] = text;
     setOtp(newOtp);
 
-    // 2. Move FORWARD only if a number was added
-    if (text !== "" && index < 5) {
+    if (text && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };
 
   const handleKeyPress = ({ nativeEvent }, index) => {
-    // 3. This catches the Backspace when the box is ALREADY empty
-    if (nativeEvent.key === "Backspace") {
-      if (otp[index] === "" && index > 0) {
-        // Jump focus back
-        inputRefs.current[index - 1].focus();
-        // OPTIONAL: If you want it to also delete the number in the previous box 
-        // immediately when it jumps back, uncomment the lines below
-        const newOtp = [...otp];
-        newOtp[index - 1] = "";
-        setOtp(newOtp);
-      }
+    if (nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1].focus();
     }
   };
 
@@ -57,7 +45,7 @@ const OTP = ({ navigation, route }) => {
     }
 
     try {
-      const res = await fetch("https://bookapp-h41h.onrender.com/api/verify-otp", {
+      const res = await fetch("http://10.0.2.2:3000/api/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode }),
@@ -79,7 +67,7 @@ const OTP = ({ navigation, route }) => {
   // ✅ RESEND OTP
   const handleResend = async () => {
     try {
-      await fetch("https://bookapp-h41h.onrender.com/api/resend-otp", {
+      await fetch("http://10.0.2.2:3000/api/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -105,21 +93,16 @@ const OTP = ({ navigation, route }) => {
 
             <View style={styles.otpContainer}>
               {otp.map((digit, index) => (
-                
                 <TextInput
                   key={index}
                   style={styles.otpInput}
                   value={digit}
                   onChangeText={(text) => handleOtpChange(text, index)}
-                  onKeyPress={(e) => handleKeyPress(e, index)}
-                  
-                  // ADD THESE TWO:
-                  keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-                  maxLength={1} 
-                  
+                  keyboardType="numeric"
+                  maxLength={1}
                   ref={(ref) => (inputRefs.current[index] = ref)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
                 />
-  
               ))}
             </View>
 
