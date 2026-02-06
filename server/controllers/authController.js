@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
     /* 1️⃣ validate */
     if (!email || !password) {
       return res.status(400).json({
-        message: "Email and password are required"
+        message: "Email and password are required",
       });
     }
 
@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({
-        message: "Email already exists"
+        message: "Email already exists",
       });
     }
 
@@ -31,7 +31,7 @@ exports.register = async (req, res) => {
     const user = await User.create({
       email,
       password: hashedPassword,
-      isVerified: false
+      isVerified: false,
     });
 
     /* 5️⃣ generate OTP */
@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
     await Otp.create({
       userId: user._id,
       otp: otpCode,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 นาที
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 นาที
     });
 
     /* 6️⃣ (optional) ส่ง OTP ทาง email ตรงนี้ */
@@ -48,13 +48,12 @@ exports.register = async (req, res) => {
 
     res.status(201).json({
       message: "Register success. Please verify OTP",
-      userId: user._id
+      userId: user._id,
     });
-
   } catch (err) {
     console.error("REGISTER ERROR:", err);
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
     });
   }
 };
@@ -83,9 +82,11 @@ exports.login = async (req, res) => {
         message: "Invalid email or password",
       });
     }
-    if (!user.isVerified) {
+    if (user.isVerified !== true) {
       return res.status(403).json({
         message: "Please verify OTP before login",
+        requireOtp: true,
+        email: user.email,
       });
     }
 
@@ -259,4 +260,3 @@ exports.uploadProfilePic = async (req, res) => {
     res.status(500).json({ message: "Upload failed" });
   }
 };
-

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,9 +15,25 @@ const bgImage = {
 };
 
 const OTP = ({ navigation, route }) => {
-  const { email } = route.params; // ✅ รับ email จาก Sign_in
+  const { email, autoResend } = route.params || {}; // ✅ รับ email จาก Sign_in
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
+
+  useEffect(() => {
+    if (autoResend) {
+      fetch("http://10.0.2.2:3000/api/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+        .then(() => {
+          alert("ส่ง OTP ใหม่ไปที่อีเมลแล้ว");
+        })
+        .catch(() => {
+          alert("ส่ง OTP ไม่สำเร็จ");
+        });
+    }
+  }, []);
 
   const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
@@ -82,7 +98,11 @@ const OTP = ({ navigation, route }) => {
   };
 
   return (
-    <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+    <ImageBackground
+      source={bgImage}
+      style={styles.background}
+      resizeMode="cover"
+    >
       <View style={styles.overlay}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -112,7 +132,10 @@ const OTP = ({ navigation, route }) => {
             </TouchableOpacity>
 
             {/* ✅ SUBMIT */}
-            <TouchableOpacity style={styles.submitButton} onPress={handleVerifyOtp}>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleVerifyOtp}
+            >
               <Text style={styles.submitButtonText}>Submit</Text>
             </TouchableOpacity>
 
