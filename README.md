@@ -60,6 +60,8 @@ app tt
 │  ├─ controllers
 │  │  ├─ authController.js
 │  │  └─ bookController.js
+│  ├─ middlewares
+│  │  └─ upload.js
 │  ├─ models
 │  │  ├─ Book.js
 │  │  ├─ BookCode.js
