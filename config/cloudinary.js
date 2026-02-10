@@ -1,4 +1,7 @@
-const cloudinary = require("../config/cloudinary");
+const cloudinary = require("cloudinary").v2;
+
+// This assumes you have cloudinary configured elsewhere, typically in your main server file
+// using process.env variables for security.
 
 const uploadToCloudinary = (buffer, folder = "") => {
   return new Promise((resolve, reject) => {
