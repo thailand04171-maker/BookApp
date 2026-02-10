@@ -55,8 +55,9 @@ const Profile = ({ navigation }) => {
     formData.append('profilePic', {
       uri: Platform.OS === 'android' ? uri : uri.replace('file://', ''),
       name: filename,
-      type: type,
+      type,
     });
+
 
     try {
       const res = await fetch(`https://bookapp-h41h.onrender.com/api/upload-profile-pic`, {
@@ -68,7 +69,12 @@ const Profile = ({ navigation }) => {
         credentials: 'include',
       });
 
-      const responseData = await res.json();
+      // const responseData = await res.json();
+      const text = await res.text();
+
+console.log('STATUS:', res.status);
+console.log('RAW RESPONSE:', text);
+
 
       if (res.ok) {
         Alert.alert('สำเร็จ', 'อัปโหลดรูปภาพเรียบร้อยแล้ว');
