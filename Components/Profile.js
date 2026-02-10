@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 const API_BASE = 'https://bookapp-h41h.onrender.com/api';
+const SERVER_URL = 'https://bookapp-h41h.onrender.com';
 
 const Profile = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -81,7 +82,10 @@ const Profile = ({ navigation }) => {
         Alert.alert('สำเร็จ', 'อัปโหลดรูปภาพเรียบร้อยแล้ว');
         console.log('1');
         if (responseData.profilePic) {
-          setProfileImage(responseData.profilePic);
+          const fullUrl = responseData.profilePic.startsWith('http') 
+            ? responseData.profilePic 
+            : `${SERVER_URL}${responseData.profilePic}`;
+          setProfileImage(fullUrl);
           console.log('1');
         }
       } else {
@@ -120,7 +124,12 @@ const Profile = ({ navigation }) => {
         const data = await res.json();
         setEmail(data.email);
         setBookCount(data.bookCount || 0);
-        if (data.profilePic) setProfileImage(data.profilePic);
+        if (data.profilePic) {
+          const fullUrl = data.profilePic.startsWith('http') 
+            ? data.profilePic 
+            : `${SERVER_URL}${data.profilePic}`;
+          setProfileImage(fullUrl);
+        }
       })
       .catch(err => {
         console.log("Fetch Profile Error:", err.message);
