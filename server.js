@@ -34,7 +34,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: true, // true สำหรับ https://bookapp-h41h.onrender.com
-    sameSite: 'lax',  
+    sameSite: 'none',  
     maxAge: 1000 * 60 * 60 * 24 // 1 วัน
   }
 }));

@@ -38,13 +38,11 @@ router.post(
   "/upload-profile-pic",
   isAuth,
   upload.single("profilePic"),
-  (req, res, next) => {
-    console.log("SESSION:", req.session);
-    console.log("FILE:", req.file);
-    next();
-  },
   uploadProfilePic
 );
+
+console.log("🔥 authRoutes loaded");
+
 
 
 // ✅ แก้ไข: เขียน Logic ตรงนี้เพื่อให้ populate bookId ได้ชัวร์ (แก้ปัญหา bookId เป็น null/string)

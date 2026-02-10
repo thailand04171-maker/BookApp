@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 const sendOtpEmail = require("../utils/sendOtpEmail");
 const BookCode = require("../models/BookCode");
+const { uploadToCloudinary } = require('../../config/cloudinary');
 
 exports.register = async (req, res) => {
   try {
@@ -247,14 +248,25 @@ exports.uploadProfilePic = async (req, res) => {
     }
 
     const user = await User.findById(req.session.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    console.log("📥 SESSION:", req.session);
+    console.log("📂 FILE:", req.file);
+    // 🔥 เหมือน #1
+    const result = await uploadToCloudinary(
+      req.file.buffer,
+      "Users/profile"
+    );
 
-    user.profilePic = `/uploads/${req.file.filename}`;
+    user.profilePic = result.secure_url;
     await user.save();
 
     res.json({
       message: "Profile picture updated",
       profilePic: user.profilePic,
     });
+
   } catch (err) {
     console.error("UPLOAD PROFILE PIC ERROR:", err);
     res.status(500).json({ message: "Upload failed" });

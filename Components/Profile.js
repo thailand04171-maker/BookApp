@@ -60,7 +60,7 @@ const Profile = ({ navigation }) => {
 
 
     try {
-      const res = await fetch(`${API_BASE}/upload-profile-pic`, {
+      const res = await fetch(`https://bookapp-h41h.onrender.com/api/upload-profile-pic`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -94,7 +94,7 @@ console.log('RAW RESPONSE:', text);
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`https://bookapp-h41h.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -106,7 +106,7 @@ console.log('RAW RESPONSE:', text);
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/profile`, { credentials: 'include' })
+    fetch(`https://bookapp-h41h.onrender.com/api/profile`, { credentials: 'include' })
       .then(async res => {
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
