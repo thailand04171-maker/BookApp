@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity, Alert
 import * as ImagePicker from 'expo-image-picker';
 
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
-const API_BASE = 'http://10.0.2.2:3000/api';
+const API_BASE = 'https://bookapp-h41h.onrender.com/api';
 
 const Profile = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -60,7 +60,7 @@ const Profile = ({ navigation }) => {
 
 
     try {
-      const res = await fetch(`https://bookapp-h41h.onrender.com/api/upload-profile-pic`, {
+      const res = await fetch(`${API_BASE}/upload-profile-pic`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -94,7 +94,7 @@ console.log('RAW RESPONSE:', text);
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`https://bookapp-h41h.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -106,7 +106,7 @@ console.log('RAW RESPONSE:', text);
   };
 
   useEffect(() => {
-    fetch(`https://bookapp-h41h.onrender.com/api/profile`, { credentials: 'include' })
+    fetch(`${API_BASE}/profile`, { credentials: 'include' })
       .then(async res => {
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
