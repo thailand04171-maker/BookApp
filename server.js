@@ -4,16 +4,17 @@ const cors = require('cors');
 const MongoStore = require('connect-mongo');
 const session = require('express-session');
 require('dotenv').config();
-
+const jwt = require("jsonwebtoken");
 const connectDB = require('./config/db');
 
 const app = express();
+
 
 // Trust proxy is required for secure cookies on Render (HTTPS)
 app.set('trust proxy', 1);
 
 // 🔥 1. middleware แปลง json
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // 🔥 2. CORS (ก่อน session)
 app.use(cors({
@@ -34,7 +35,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: true, // true สำหรับ https://bookapp-h41h.onrender.com
-    sameSite: 'none',  
+    sameSite: 'none',
     maxAge: 1000 * 60 * 60 * 24 // 1 วัน
   }
 }));

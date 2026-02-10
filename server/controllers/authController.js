@@ -3,7 +3,8 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 const sendOtpEmail = require("../utils/sendOtpEmail");
 const BookCode = require("../models/BookCode");
-const { uploadToCloudinary } = require('../../config/cloudinary');
+// const { uploadToCloudinary } = require('../../config/cloudinary');
+const uploadToCloudinary = require("../utils/uploadToCloudinary");
 
 exports.register = async (req, res) => {
   try {
@@ -239,7 +240,10 @@ exports.profile = async (req, res) => {
 
 exports.uploadProfilePic = async (req, res) => {
   try {
-    if (!req.session?.user) {
+    console.log("📥 SESSION:", req.session);
+    console.log("📦 FILE:", req.file);
+
+    if (!req.session || !req.session.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
@@ -247,28 +251,24 @@ exports.uploadProfilePic = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const user = await User.findById(req.session.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    console.log("📥 SESSION:", req.session);
-    console.log("📂 FILE:", req.file);
-    // 🔥 เหมือน #1
     const result = await uploadToCloudinary(
       req.file.buffer,
-      "Users/profile"
+      "profile-pics"
     );
 
+    const user = await User.findById(req.session.user.id);
     user.profilePic = result.secure_url;
     await user.save();
 
+    // 🔥 sync session
+    req.session.user.profilePic = result.secure_url;
+
     res.json({
       message: "Profile picture updated",
-      profilePic: user.profilePic,
+      profilePic: result.secure_url,
     });
-
   } catch (err) {
-    console.error("UPLOAD PROFILE PIC ERROR:", err);
+    console.log("❌ UPLOAD ERROR FULL:", err);
     res.status(500).json({ message: "Upload failed" });
   }
 };

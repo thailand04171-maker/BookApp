@@ -14,7 +14,7 @@ const Profile = ({ navigation }) => {
   const handlePickImage = async () => {
     // 1. Better status check logic
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (status !== 'granted') {
       Alert.alert('Permission Denied', 'Gallery permissions are needed to change your avatar.');
       return;
@@ -24,15 +24,15 @@ const Profile = ({ navigation }) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.5, 
+      quality: 0.5,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedAsset = result.assets[0];
-      
+
       // Update local UI immediately for responsiveness
       setProfileImage(selectedAsset.uri);
-      
+
       // Start the upload process
       uploadAvatar(selectedAsset);
     }
@@ -40,13 +40,13 @@ const Profile = ({ navigation }) => {
 
   const uploadAvatar = async (asset) => {
     setUploading(true);
-    
+    console.log('🔥 uploadAvatar CALLED', asset);
     const formData = new FormData();
     const uri = asset.uri;
-    
+
     // Extract filename from URI
     const filename = uri.split('/').pop();
-    
+
     // Infer type or default to image/jpeg
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : `image/jpeg`;
@@ -60,29 +60,37 @@ const Profile = ({ navigation }) => {
 
 
     try {
-      const res = await fetch(`https://bookapp-h41h.onrender.com/api/upload-profile-pic`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json',
-        },
-        credentials: 'include',
-      });
+      const res = await fetch(
+        'https://bookapp-h41h.onrender.com/api/upload-profile-pic',
+        {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Accept: 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
 
-      // const responseData = await res.json();
-      const text = await res.text();
-
-console.log('STATUS:', res.status);
-console.log('RAW RESPONSE:', text);
-
+      const responseData = await res.json();
+      console.log('SESSION USER:', req.session.user);
+      console.log('STATUS:', res.status);
+      console.log('RESPONSE:', responseData);
 
       if (res.ok) {
         Alert.alert('สำเร็จ', 'อัปโหลดรูปภาพเรียบร้อยแล้ว');
-        // Optional: Update state with the final server URL if provided
-        if (responseData.profilePic) setProfileImage(responseData.profilePic);
+        console.log('1');
+        if (responseData.profilePic) {
+          setProfileImage(responseData.profilePic);
+          console.log('1');
+        }
       } else {
-        Alert.alert('ล้มเหลว', responseData.message || 'เซิร์ฟเวอร์ปฏิเสธการอัปโหลด');
+        Alert.alert(
+          'ล้มเหลว2',
+          responseData.message || 'เซิร์ฟเวอร์ปฏิเสธการอัปโหลด'
+        );
       }
+
     } catch (err) {
       console.error('Upload Error Details:', err);
       Alert.alert('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
@@ -125,20 +133,20 @@ console.log('RAW RESPONSE:', text);
         <View style={styles.header}><Text style={styles.headerTitle}>Profile</Text></View>
         <View style={styles.container}>
           <Text style={styles.title}>My Profile</Text>
-          
-          <TouchableOpacity 
-            onPress={handlePickImage} 
-            activeOpacity={0.8} 
+
+          <TouchableOpacity
+            onPress={handlePickImage}
+            activeOpacity={0.8}
             disabled={uploading}
           >
             <View style={styles.avatarContainer}>
-              <Image 
-                source={{ uri: profileImage }} 
-                style={styles.avatar} 
+              <Image
+                source={{ uri: profileImage }}
+                style={styles.avatar}
                 // Handles broken links
                 defaultSource={{ uri: 'https://via.placeholder.com/150' }}
               />
-              
+
               {uploading ? (
                 <View style={styles.loadingOverlay}>
                   <ActivityIndicator color="orange" size="large" />
@@ -154,7 +162,7 @@ console.log('RAW RESPONSE:', text);
           <View style={styles.infoBox}>
             <Text style={styles.emailLabel}>{email || "Loading..."}</Text>
             <Text style={styles.bookLabel}>Books owned: {bookCount}</Text>
-            
+
             <TouchableOpacity style={[styles.editBtn, styles.logoutBtn]} onPress={handleLogout}>
               <Text style={styles.btnText}>ออกจากระบบ</Text>
             </TouchableOpacity>
@@ -172,11 +180,11 @@ const styles = StyleSheet.create({
   headerTitle: { color: '#fff', fontSize: 18 },
   container: { padding: 20, alignItems: 'center' },
   title: { fontSize: 36, fontWeight: 'bold', alignSelf: 'flex-start', color: '#000', marginBottom: 10 },
-  avatarContainer: { 
-    borderWidth: 5, 
+  avatarContainer: {
+    borderWidth: 5,
     borderColor: 'orange', // The Yellow/Orange Circle
-    borderRadius: 85, 
-    marginVertical: 20, 
+    borderRadius: 85,
+    marginVertical: 20,
     position: 'relative',
     elevation: 8,
     backgroundColor: '#fff',
@@ -200,10 +208,10 @@ const styles = StyleSheet.create({
     borderColor: 'orange',
     elevation: 4,
   },
-  infoBox: { 
-    backgroundColor: 'rgba(255,255,255,0.95)', 
-    padding: 25, 
-    width: '100%', 
+  infoBox: {
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    padding: 25,
+    width: '100%',
     borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
