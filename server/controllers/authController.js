@@ -3,7 +3,7 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 const sendOtpEmail = require("../utils/sendOtpEmail");
 const BookCode = require("../models/BookCode");
-const { uploadToCloudinary } = require('../../config/cloudinary');
+const uploadToCloudinary = require('../../config/cloudinary');
 
 exports.register = async (req, res) => {
   try {
@@ -253,18 +253,28 @@ exports.uploadProfilePic = async (req, res) => {
     }
     console.log("📥 SESSION:", req.session);
     console.log("📂 FILE:", req.file);
-    // 🔥 เหมือน #1
-    const result = await uploadToCloudinary(
-      req.file.buffer,
-      "Users/profile"
-    );
+
+    const result = await uploadToCloudinary(req.file.buffer, "user_avatars");
 
     user.profilePic = result.secure_url;
     await user.save();
 
-    res.json({
-      message: "Profile picture updated",
-      profilePic: user.profilePic,
+    // 🔥 CRITICAL: Update the session with the new profile picture URL
+    // to prevent showing the old image after a refresh.
+    req.session.user.profilePic = user.profilePic;
+
+    // Save the session explicitly before sending the response
+    req.session.save((err) => {
+      if (err) {
+        // Log the error, but still send a success response as the DB is updated.
+        console.error("SESSION SAVE ERROR after profile pic upload:", err);
+      }
+      console.log("✅ SESSION UPDATED with new profile pic");
+
+      res.json({
+        message: "Profile picture updated",
+        profilePic: user.profilePic,
+      });
     });
 
   } catch (err) {
