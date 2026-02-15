@@ -28,8 +28,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "863d87b6-9dcb-4ba2-bfe2-a181741360d1"
+        "projectId": "f199e5a8-7da4-4f22-a3b0-227770ee0a3b"
       }
-    }
+    },
+    "owner": "lastmods"
   }
 }
