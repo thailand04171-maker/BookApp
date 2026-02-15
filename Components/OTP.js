@@ -97,7 +97,7 @@ const OTP = ({ navigation, route }) => {
   // ✅ RESEND OTP
   const handleResend = async () => {
     try {
-      await fetch("http://10.0.2.2:3000/api/resend-otp", {
+      await fetch("https://bookapp-h41h.onrender/api/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
