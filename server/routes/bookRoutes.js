@@ -8,7 +8,7 @@ const {
   getDashboardData
 } = require("../controllers/bookController");
 
-const auth = require("../middleware/auth");
+const auth = require("../middlewares/auth");
 const upload = require("../middleware/upload");
 
 // ➕ Add book (ต้อง login)

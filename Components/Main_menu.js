@@ -13,7 +13,7 @@ import {
 const bgImage = {
   uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'
 };
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Main_menu = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   // ✅ Hook ต้องอยู่ตรงนี้เท่านั้น
@@ -25,26 +25,30 @@ const Main_menu = ({ navigation }) => {
       .includes(searchText.toLowerCase())
   );
   useEffect(() => {
+    console.log("fetchMyBooks")
     fetchMyBooks();
   }, []);
 
   const fetchMyBooks = async () => {
-    try {
-      const res = await fetch('https://bookapp-h41h.onrender.com/api/my-books', {
-        credentials: 'include',
-      });
+  try {
+    const token = await AsyncStorage.getItem("token");
 
-      const data = await res.json();
-      console.log("My Books Data:", JSON.stringify(data, null, 2)); // 🔥 เช็คข้อมูลที่ได้จาก API ใน Terminal
-      if (Array.isArray(data)) {
-        setBooks(data);
-      } else {
-        setBooks([]);
+    const res = await fetch('http://10.0.2.2:3000/api/my-books', {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    } catch (err) {
-      console.log('FETCH BOOK ERROR:', err);
+    });
+
+    const data = await res.json();
+    console.log("My Books Data:", data);
+
+    if (Array.isArray(data)) {
+      setBooks(data);
     }
-  };
+  } catch (err) {
+    console.log('FETCH BOOK ERROR:', err);
+  }
+};
 
   return (
     <ImageBackground source={bgImage} style={styles.background}>

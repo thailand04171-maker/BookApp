@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 const API_BASE = 'https://bookapp-h41h.onrender.com/api';
 const SERVER_URL = 'https://bookapp-h41h.onrender.com';
@@ -41,62 +41,50 @@ const Profile = ({ navigation }) => {
 
   const uploadAvatar = async (asset) => {
     setUploading(true);
-    console.log('🔥 uploadAvatar CALLED', asset);
+
     const formData = new FormData();
     const uri = asset.uri;
-
-    // Extract filename from URI
     const filename = uri.split('/').pop();
-
-    // Infer type or default to image/jpeg
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : `image/jpeg`;
 
-    // 2. CRITICAL: Ensure the object matches exactly what the server expects
     formData.append('profilePic', {
       uri: Platform.OS === 'android' ? uri : uri.replace('file://', ''),
       name: filename,
       type,
     });
 
-
     try {
+      const token = await AsyncStorage.getItem("token");
+      console.log("TOKEN:", token);
       const res = await fetch(
-        'https://bookapp-h41h.onrender.com/api/upload-profile-pic',
+        'http://10.0.2.2:3000/api/upload-profile-pic',
         {
           method: 'POST',
-          body: formData,
           headers: {
-            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,   // 🔥 สำคัญ
           },
-          credentials: 'include',
+          body: formData,
         }
       );
 
       const responseData = await res.json();
-      console.log('SESSION USER:', req.session.user);
       console.log('STATUS:', res.status);
       console.log('RESPONSE:', responseData);
 
       if (res.ok) {
         Alert.alert('สำเร็จ', 'อัปโหลดรูปภาพเรียบร้อยแล้ว');
-        console.log('1');
         if (responseData.profilePic) {
-          const fullUrl = responseData.profilePic.startsWith('http') 
-            ? responseData.profilePic 
+          const fullUrl = responseData.profilePic.startsWith('http')
+            ? responseData.profilePic
             : `${SERVER_URL}${responseData.profilePic}`;
           setProfileImage(fullUrl);
-          console.log('1');
         }
       } else {
-        Alert.alert(
-          'ล้มเหลว2',
-          responseData.message || 'เซิร์ฟเวอร์ปฏิเสธการอัปโหลด'
-        );
+        Alert.alert('ล้มเหลว', responseData.message || 'อัปโหลดไม่สำเร็จ');
       }
-
     } catch (err) {
-      console.error('Upload Error Details:', err);
+      console.error('Upload Error:', err);
       Alert.alert('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
     } finally {
       setUploading(false);
@@ -106,7 +94,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`https://bookapp-h41h.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`http://10.0.2.2:3000/api/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -118,15 +106,15 @@ const Profile = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetch(`https://bookapp-h41h.onrender.com/api/profile`, { credentials: 'include' })
+    fetch(`http://10.0.2.2:3000/api/profile`, { credentials: 'include' })
       .then(async res => {
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
         setEmail(data.email);
         setBookCount(data.bookCount || 0);
         if (data.profilePic) {
-          const fullUrl = data.profilePic.startsWith('http') 
-            ? data.profilePic 
+          const fullUrl = data.profilePic.startsWith('http')
+            ? data.profilePic
             : `${SERVER_URL}${data.profilePic}`;
           setProfileImage(fullUrl);
         }
@@ -235,4 +223,4 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 }
 });
 
-export default Profile;
+export default Profile; 

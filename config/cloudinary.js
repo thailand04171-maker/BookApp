@@ -1,23 +1,15 @@
 const cloudinary = require("cloudinary").v2;
 
-// This assumes you have cloudinary configured elsewhere, typically in your main server file
-// using process.env variables for security.
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const uploadToCloudinary = (buffer, folder = "") => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          folder,
-          resource_type: "image",
-        },
-        (err, result) => {
-          if (err) reject(err);
-          else resolve(result);
-        }
-      )
-      .end(buffer);
-  });
-};
+console.log("☁️ CLOUDINARY CONFIG:", {
+  name: process.env.CLOUDINARY_CLOUD_NAME,
+  key: process.env.CLOUDINARY_API_KEY ? "OK" : "MISSING",
+  secret: process.env.CLOUDINARY_API_SECRET ? "OK" : "MISSING",
+});
 
-module.exports = uploadToCloudinary;
+module.exports = cloudinary;

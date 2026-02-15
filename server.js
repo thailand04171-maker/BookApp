@@ -4,9 +4,10 @@ const cors = require('cors');
 const MongoStore = require('connect-mongo');
 const session = require('express-session');
 require('dotenv').config();
+require("./config/cloudinary");
 const jwt = require("jsonwebtoken");
 const connectDB = require('./config/db');
-
+const auth = require('./server/routes/authRoutes')
 const app = express();
 
 
@@ -33,16 +34,18 @@ app.use(session({
     collectionName: 'sessions'
   }),
   cookie: {
-    httpOnly: true,
-    secure: true, // true สำหรับ https://bookapp-h41h.onrender.com
-    sameSite: 'none',
+    // httpOnly: true,
+    // secure: true, // true สำหรับ https://bookapp-h41h.onrender.com
+    // sameSite: 'none',
+      httpOnly: true,
+  secure: false,
+  sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24 // 1 วัน
   }
 }));
 
 // 🔥 4. routes
-app.use('/api', require('./server/routes/authRoutes'));
-
+app.use('/api', auth);
 // 🔥 5. connect DB
 connectDB();
 

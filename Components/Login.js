@@ -13,7 +13,7 @@ import {
   ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const bgImage = {
   uri: "https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg",
 };
@@ -26,6 +26,7 @@ const Login = ({ navigation }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleLogin = async () => {
+    const token = await AsyncStorage.getItem("token");
     if (!email || !password) {
       alert("กรุณากรอกอีเมลและรหัสผ่าน");
       return;
@@ -33,7 +34,7 @@ const Login = ({ navigation }) => {
 
     try {
       const res = await fetch(
-        "https://bookapp-h41h.onrender.com/api/login",
+        "http://10.0.2.2:3000/api/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -43,9 +44,16 @@ const Login = ({ navigation }) => {
       );
 
       const data = await res.json();
-
+      console.log("FULL LOGIN RESPONSE:", data);
+            console.log("TOKEN FROM API:", data.token);
       // ✅ LOGIN SUCCESS
       if (res.ok) {
+        console.log("LOGIN RESPONSE:", data);
+
+        if (data.token) {
+          await AsyncStorage.setItem("token", data.token);
+        }
+
         alert("เข้าสู่ระบบสำเร็จ");
         navigation.navigate("Home");
         return;

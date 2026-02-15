@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 const sendOtpEmail = require("../utils/sendOtpEmail");
 const BookCode = require("../models/BookCode");
+const jwt = require("jsonwebtoken");
 // const { uploadToCloudinary } = require('../../config/cloudinary');
 const uploadToCloudinary = require("../utils/uploadToCloudinary");
 
@@ -64,7 +65,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({
         message: "Email and password are required",
@@ -98,10 +98,15 @@ exports.login = async (req, res) => {
       email: user.email,
       profilePic: user.profilePic || null,
     };
-    console.log("✅ SET SESSION LOGIN SESSION:", req.session.user);
-
+    // console.log("✅ SET SESSION LOGIN SESSION:", req.session.user);
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
     res.json({
       message: "Login success",
+      token,
       user: {
         id: user._id,
         email: user.email,
@@ -121,9 +126,6 @@ exports.login = async (req, res) => {
 ===================== */
 exports.logout = (req, res) => {
   console.log("🚪 LOGOUT API HIT");
-  console.log("📥 SESSION ID:", req.sessionID);
-  console.log("📦 SESSION:", req.session);
-
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).json({ message: "Logout failed" });
@@ -240,35 +242,21 @@ exports.profile = async (req, res) => {
 
 exports.uploadProfilePic = async (req, res) => {
   try {
-    console.log("📥 SESSION:", req.session);
-    console.log("📦 FILE:", req.file);
-
-    if (!req.session || !req.session.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
+    const userId = req.user.id; // มาจาก JWT
+    console.log(userId)
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const result = await uploadToCloudinary(
-      req.file.buffer,
-      "profile-pics"
-    );
+    const result = await uploadToCloudinary(req.file.buffer, "User-Profile");
 
-    const user = await User.findById(req.session.user.id);
+    const user = await User.findById(userId);
     user.profilePic = result.secure_url;
     await user.save();
 
-    // 🔥 sync session
-    req.session.user.profilePic = result.secure_url;
-
-    res.json({
-      message: "Profile picture updated",
-      profilePic: result.secure_url,
-    });
+    res.json({ profilePic: result.secure_url });
   } catch (err) {
-    console.log("❌ UPLOAD ERROR FULL:", err);
-    res.status(500).json({ message: "Upload failed" });
+      console.error(err);
+        res.status(500).send('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
   }
 };
