@@ -162,37 +162,52 @@ router.post("/verify-otp", async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("❌ User not found");
       return res.status(400).json({ message: "User not found" });
     }
 
     const otpRecord = await Otp.findOne({ userId: user._id });
 
     if (!otpRecord) {
-      console.log("❌ OTP not found");
       return res.status(400).json({ message: "OTP not found" });
     }
 
-    // ⏰ check expire
     if (otpRecord.expiresAt < new Date()) {
-      console.log("❌ OTP expired");
       return res.status(400).json({ message: "OTP expired" });
     }
 
-    // 🔢 check match
     if (otpRecord.otp !== otp) {
-      console.log("❌ OTP incorrect");
       return res.status(400).json({ message: "OTP incorrect" });
     }
 
-    // ✅ SUCCESS
+    // ✅ SUCCESS: ยืนยันตัวตนสำเร็จ
     user.isVerified = true;
     await user.save();
     await Otp.deleteOne({ _id: otpRecord._id });
 
+    // 🔥 [เพิ่มใหม่] สร้าง SESSION ทันที (เพื่อให้ Profile โหลดได้เลย)
+    req.session.user = {
+      id: user._id,
+      email: user.email,
+      profilePic: user.profilePic || null,
+    };
+    console.log("✅ SET SESSION AFTER OTP:", req.session.user);
+
+    // 🔥 [เพิ่มใหม่] สร้าง TOKEN ทันที (เพื่อให้เอาไปใช้อัปโหลดรูปได้เลย)
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     console.log("✅ OTP verified successfully for:", email);
 
-    res.json({ message: "OTP verified successfully" });
+    // ส่ง Token กลับไปให้ Frontend
+    res.json({ 
+      message: "OTP verified successfully",
+      token, 
+      user: req.session.user 
+    });
+
   } catch (err) {
     console.error("VERIFY OTP ERROR:", err);
     res.status(500).json({ message: "Server error" });

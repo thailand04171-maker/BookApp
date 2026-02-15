@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   StyleSheet,
   Text,
@@ -61,21 +62,34 @@ const OTP = ({ navigation, route }) => {
     }
 
     try {
+      // อย่าลืมใส่ credentials: 'include' เพื่อให้ Server สร้าง Session Cookie ได้
       const res = await fetch("http://10.0.2.2:3000/api/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode }),
+        credentials: 'include', // 🔥 สำคัญ: เพื่อให้ Cookie Session ถูกบันทึก
       });
 
       const data = await res.json();
 
       if (res.ok) {
+        // 🔥 บันทึก Token ลงเครื่อง
+        if (data.token) {
+          await AsyncStorage.setItem("token", data.token);
+        }
+        
         alert("ยืนยัน OTP สำเร็จ");
-        navigation.navigate("Home");
+        
+        // รีเซ็ต Stack แล้วไปหน้า Home เพื่อให้ Profile รีเฟรชใหม่แน่นอน
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
       } else {
         alert(data.message);
       }
     } catch (err) {
+      console.log(err);
       alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
     }
   };
