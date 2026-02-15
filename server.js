@@ -22,7 +22,7 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
-
+//3
 // 🔥 3. SESSION (ต้องอยู่ก่อน routes)
 app.use(session({
   name: 'connect.sid',
