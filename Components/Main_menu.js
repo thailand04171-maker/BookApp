@@ -27,7 +27,7 @@ const Main_menu = ({ navigation }) => {
   useEffect(() => {
     console.log("fetchMyBooks")
     fetchMyBooks();
-  }, []);
+  }, [books]);
 
   const fetchMyBooks = async () => {
   try {
