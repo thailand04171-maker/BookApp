@@ -58,7 +58,7 @@ const Profile = ({ navigation }) => {
       const token = await AsyncStorage.getItem("token");
       console.log("TOKEN:", token);
       const res = await fetch(
-        'http://10.0.2.2:3000/api/upload-profile-pic',
+        'https://bookapp-h41h.onrender.com/api/upload-profile-pic',
         {
           method: 'POST',
           headers: {
@@ -94,7 +94,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`http://10.0.2.2:3000/api/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`https://bookapp-h41h.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -106,7 +106,7 @@ const Profile = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetch(`http://10.0.2.2:3000/api/profile`, { credentials: 'include' })
+    fetch(`https://bookapp-h41h.onrender.com/api/profile`, { credentials: 'include' })
       .then(async res => {
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();

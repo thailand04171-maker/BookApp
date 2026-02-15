@@ -22,7 +22,7 @@ const OTP = ({ navigation, route }) => {
 
   useEffect(() => {
     if (autoResend) {
-      fetch("http://10.0.2.2:3000/api/resend-otp", {
+      fetch("https://bookapp-h41h.onrender.com/api/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -63,7 +63,7 @@ const OTP = ({ navigation, route }) => {
 
     try {
       // อย่าลืมใส่ credentials: 'include' เพื่อให้ Server สร้าง Session Cookie ได้
-      const res = await fetch("http://10.0.2.2:3000/api/verify-otp", {
+      const res = await fetch("https://bookapp-h41h.onrender.com/api/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode }),
@@ -97,7 +97,7 @@ const OTP = ({ navigation, route }) => {
   // ✅ RESEND OTP
   const handleResend = async () => {
     try {
-      await fetch("http://10.0.2.2:3000/api/resend-otp", {
+      await fetch("https://bookapp-h41h.onrender.com/api/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

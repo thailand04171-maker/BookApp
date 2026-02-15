@@ -42,7 +42,7 @@ const handleRegister = async () => {
     }
 
     try {
-      const res = await fetch("http://10.0.2.2:3000/api/register", {
+      const res = await fetch("https://bookapp-h41h.onrender.com/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
