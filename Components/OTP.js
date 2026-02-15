@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   StyleSheet,
   Text,
@@ -21,7 +22,7 @@ const OTP = ({ navigation, route }) => {
 
   useEffect(() => {
     if (autoResend) {
-      fetch("https://bookapp-70mc.onrender.com/api/resend-otp", {
+      fetch("https://bookapp-h41h.onrender.com/api/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -61,21 +62,34 @@ const OTP = ({ navigation, route }) => {
     }
 
     try {
-      const res = await fetch("https://bookapp-70mc.onrender.com/api/verify-otp", {
+      // อย่าลืมใส่ credentials: 'include' เพื่อให้ Server สร้าง Session Cookie ได้
+      const res = await fetch("https://bookapp-h41h.onrender.com/api/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode }),
+        credentials: 'include', // 🔥 สำคัญ: เพื่อให้ Cookie Session ถูกบันทึก
       });
 
       const data = await res.json();
 
       if (res.ok) {
+        // 🔥 บันทึก Token ลงเครื่อง
+        if (data.token) {
+          await AsyncStorage.setItem("token", data.token);
+        }
+        
         alert("ยืนยัน OTP สำเร็จ");
-        navigation.navigate("Home");
+        
+        // รีเซ็ต Stack แล้วไปหน้า Home เพื่อให้ Profile รีเฟรชใหม่แน่นอน
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
       } else {
         alert(data.message);
       }
     } catch (err) {
+      console.log(err);
       alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
     }
   };
@@ -83,7 +97,7 @@ const OTP = ({ navigation, route }) => {
   // ✅ RESEND OTP
   const handleResend = async () => {
     try {
-      await fetch("https://bookapp-70mc.onrender.com/api/resend-otp", {
+      await fetch("https://bookapp-h41h.onrender.com/api/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

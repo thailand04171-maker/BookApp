@@ -25,30 +25,22 @@ const Main_menu = ({ navigation }) => {
       .includes(searchText.toLowerCase())
   );
   useEffect(() => {
-    console.log("fetchMyBooks")
     fetchMyBooks();
-  }, []);
+  }, [books]);
 
   const fetchMyBooks = async () => {
-  try {
-    const token = await AsyncStorage.getItem("token");
+    try {
+      const token = await AsyncStorage.getItem("token");
 
-    const res = await fetch('https://bookapp-70mc.onrender.com/api/my-books', {
+    const res = await fetch('https://bookapp-h41h.onrender.com/api/my-books', {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    });
-
-    const data = await res.json();
-    console.log("My Books Data:", data);
-
-    if (Array.isArray(data)) {
-      setBooks(data);
+      })
+    } catch (err) {
+      console.log('FETCH BOOK ERROR:', err);
     }
-  } catch (err) {
-    console.log('FETCH BOOK ERROR:', err);
-  }
-};
+  };
 
   return (
     <ImageBackground source={bgImage} style={styles.background}>
@@ -84,8 +76,8 @@ const Main_menu = ({ navigation }) => {
               filteredBooks.map((book) => {
                 // 🔥 ตรวจสอบว่ามี URL และเป็น http หรือไม่ (ป้องกัน path แบบ relative เช่น /images/...)
                 const rawUrl = book.bookId?.coverImage?.url;
-                const imageUrl = (rawUrl && rawUrl.startsWith('http')) 
-                  ? rawUrl 
+                const imageUrl = (rawUrl && rawUrl.startsWith('http'))
+                  ? rawUrl
                   : 'https://via.placeholder.com/150';
 
                 return (
@@ -95,7 +87,7 @@ const Main_menu = ({ navigation }) => {
                     onPress={() =>
                       navigation.navigate('Book_Decs', {
                         title: book.bookTitle,
-                        image: imageUrl, 
+                        image: imageUrl,
                         description: book.bookId?.detail || "ไม่มีรายละเอียด", // 🔥 แก้ไข: ดึงจาก field 'detail' ตาม JSON
                         pdfUrl: book.bookId?.pdfFile?.url, // 🔥 แก้ไข: ดึงจาก field 'pdfFile.url' ตาม JSON
                       })
