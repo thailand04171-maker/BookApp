@@ -32,16 +32,9 @@ const Main_menu = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem("token");
 
-      const res = await fetch('https://bookapp-h41h.onrender/api/my-books', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setBooks(data);
+    const res = await fetch('https://bookapp-h41h.onrender.com/api/my-books', {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     } catch (err) {
       console.log('FETCH BOOK ERROR:', err);
