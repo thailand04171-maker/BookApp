@@ -104,24 +104,45 @@ const Profile = ({ navigation }) => {
       Alert.alert('Error', 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
     }
   };
+  const fetchProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
 
-  useEffect(() => {
-    fetch(`https://bookapp-70mc.onrender.com/api/profile`, { credentials: 'include' })
-      .then(async res => {
-        if (!res.ok) throw new Error('Unauthorized');
-        const data = await res.json();
-        setEmail(data.email);
-        setBookCount(data.bookCount || 0);
-        if (data.profilePic) {
-          const fullUrl = data.profilePic.startsWith('http')
-            ? data.profilePic
-            : `${SERVER_URL}${data.profilePic}`;
-          setProfileImage(fullUrl);
+      const res = await fetch(
+        'https://bookapp-70mc.onrender.com/api/profile',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      })
-      .catch(err => {
-        console.log("Fetch Profile Error:", err.message);
-      });
+      );
+
+      if (!res.ok) throw new Error("Unauthorized");
+
+      const data = await res.json();
+
+      setEmail(data.email);
+      setBookCount(data.bookCount || 0);
+
+      if (data.profilePic) {
+        const fullUrl = data.profilePic.startsWith('http')
+          ? data.profilePic
+          : `${SERVER_URL}${data.profilePic}`;
+        setProfileImage(fullUrl);
+      }
+
+    } catch (err) {
+      console.log("Fetch Profile Error:", err.message);
+    }
+  };
+  useEffect(() => {
+    fetchProfile(); // โหลดครั้งแรก
+
+    const interval = setInterval(() => {
+      fetchProfile(); // โหลดซ้ำทุก 5 วิ
+    }, 5000);
+
+    return () => clearInterval(interval); // ป้องกัน memory leak
   }, []);
 
   return (
