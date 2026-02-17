@@ -49,16 +49,6 @@ const handleRegister = async () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
-      const data = await res.json();
-      console.log(data);
-
-      if (res.ok) {
-        alert("กรอกรหัส OTP ที่ส่งไปใน Email ของคุณ");
-        navigation.navigate("OTP", { email });
-      } else {
-        alert(data.message || "สมัครไม่สำเร็จ");
-      }
     } catch (err) {
       alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
     }

@@ -22,7 +22,6 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
-//3
 // 🔥 3. SESSION (ต้องอยู่ก่อน routes)
 app.use(session({
   name: 'connect.sid',
@@ -34,12 +33,9 @@ app.use(session({
     collectionName: 'sessions'
   }),
   cookie: {
-    // httpOnly: true,
-    // secure: true, // true สำหรับ https://bookapp-h41h.onrender.com
-    // sameSite: 'none',
-      httpOnly: true,
-  secure: false,
-  sameSite: 'lax',
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24 // 1 วัน
   }
 }));

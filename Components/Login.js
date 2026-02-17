@@ -59,16 +59,6 @@ const Login = ({ navigation }) => {
         return;
       }
 
-      // 🔒 ยังไม่ verify OTP
-      if (res.status === 403) {
-        alert("กรุณายืนยัน OTP ก่อนเข้าสู่ระบบ");
-        navigation.navigate("OTP", {
-          email,
-          autoResend: true,
-        });
-        return;
-      }
-
       // ❌ ERROR อื่น
       alert(data.message || "เข้าสู่ระบบไม่สำเร็จ");
     } catch (err) {

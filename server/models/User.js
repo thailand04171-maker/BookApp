@@ -14,10 +14,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: 'https://via.placeholder.com/150' 
   },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
   createdAt: {
     type: Date,
     default: Date.now

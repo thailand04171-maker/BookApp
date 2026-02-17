@@ -2,11 +2,9 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import Welcome from './Components/Welcome';
 import Login from './Components/Login';
 import Sign_in from './Components/Sign_in';
-import OTP from './Components/OTP';
 import Search from './Components/Search';
 import AddbyCode from './Components/AddbyCode';
 import Book_Decs from './Components/Book_Decs';
@@ -23,8 +21,7 @@ export default function App() {
         {/* Auth Screens */}
         <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Sign_in" component={Sign_in} />
-        <Stack.Screen name="OTP" component={OTP} />        
+        <Stack.Screen name="Sign_in" component={Sign_in} />      
         {/* Main App - This contains the Bottom Tabs */}
         <Stack.Screen name="Home" component={TabNavigator} />
         <Stack.Screen name="AddbyCode" component={AddbyCode} />

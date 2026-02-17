@@ -6,22 +6,8 @@ const auth = require("../middlewares/auth");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Otp = require("../models/Otp");
 const uploadToCloudinary = require("../utils/uploadToCloudinary");
-const sendOtpEmail = require("../utils/sendOtpEmail");
 // ✅ import logout มาด้วย
-const {
-  logout,
-  verifyOtp,
-  resendOtp,
-  profile,
-  uploadProfilePic
-} = require("../controllers/authController");
-const {
-  addBookByCode,
-  getMyBooks
-} = require("../controllers/bookController");
-
 const isAuth = (req, res, next) => {
   console.log('SESSION USER:', req.session.user);
   if (!req.session?.user) {
@@ -54,29 +40,18 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    /* 4️⃣ create user (ยังไม่ verified) */
     const user = await User.create({
       email,
       password: hashedPassword,
-      isVerified: false,
     });
-
-    /* 5️⃣ generate OTP */
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await Otp.create({
-      userId: user._id,
-      otp: otpCode,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 นาที
-    });
-
-    /* 6️⃣ (optional) ส่ง OTP ทาง email ตรงนี้ */
-    await sendOtpEmail(email, otpCode);
-
-    res.status(201).json({
-      message: "Register success. Please verify OTP",
-      userId: user._id,
-    });
+    const data = await res.json();r
+    if (res.ok) {
+      alert("สมัครสมาชิกคนดำสำเร็จ");
+      navigation.navigate("Login");
+      console.log("Register Complete");
+    } else {
+      alert(data.message || "สมัครไม่สำเร็จ");
+    }
   } catch (err) {
     console.error("REGISTER ERROR:", err);
     res.status(500).json({
@@ -105,13 +80,6 @@ router.post("/login", async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({
         message: "Invalid email or password",
-      });
-    }
-    if (user.isVerified !== true) {
-      return res.status(403).json({
-        message: "Please verify OTP before login",
-        requireOtp: true,
-        email: user.email,
       });
     }
 
@@ -155,98 +123,7 @@ router.post("/logout", (req, res) => {
     res.json({ message: "Logout success" });
   });
 });
-router.post("/verify-otp", async (req, res) => {
-  console.log("Enter Verify");
-  try {
-    const { email, otp } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    const otpRecord = await Otp.findOne({ userId: user._id });
-
-    if (!otpRecord) {
-      return res.status(400).json({ message: "OTP not found" });
-    }
-
-    if (otpRecord.expiresAt < new Date()) {
-      return res.status(400).json({ message: "OTP expired" });
-    }
-
-    if (otpRecord.otp !== otp) {
-      return res.status(400).json({ message: "OTP incorrect" });
-    }
-
-    // ✅ SUCCESS: ยืนยันตัวตนสำเร็จ
-    user.isVerified = true;
-    await user.save();
-    await Otp.deleteOne({ _id: otpRecord._id });
-
-    // 🔥 [เพิ่มใหม่] สร้าง SESSION ทันที (เพื่อให้ Profile โหลดได้เลย)
-    req.session.user = {
-      id: user._id,
-      email: user.email,
-      profilePic: user.profilePic || null,
-    };
-    console.log("✅ SET SESSION AFTER OTP:", req.session.user);
-
-    // 🔥 [เพิ่มใหม่] สร้าง TOKEN ทันที (เพื่อให้เอาไปใช้อัปโหลดรูปได้เลย)
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    console.log("✅ OTP verified successfully for:", email);
-
-    // ส่ง Token กลับไปให้ Frontend
-    res.json({ 
-      message: "OTP verified successfully",
-      token, 
-      user: req.session.user 
-    });
-
-  } catch (err) {
-    console.error("VERIFY OTP ERROR:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-router.post("/resend-otp", async (req, res) => {
-  console.log("Enter resend otp");
-  try {
-    const { email } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    // ลบ OTP เก่า
-    await Otp.deleteMany({ userId: user._id });
-
-    // สร้าง OTP ใหม่
-    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await Otp.create({
-      userId: user._id,
-      otp: newOtp,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-    });
-
-    console.log("🔁 Resent OTP:", newOtp);
-
-    // 👉 ส่ง email ตรงนี้
-    await sendOtpEmail(email, newOtp);
-
-    res.json({ message: "OTP resent successfully" });
-  } catch (err) {
-    console.error("RESEND OTP ERROR:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-router.get('/profile',isAuth, async (req, res) => {
+router.get('/profile', isAuth, async (req, res) => {
   console.log("Enter profile");
   try {
     console.log("📥 SESSION:", req.session);
