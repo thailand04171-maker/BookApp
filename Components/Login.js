@@ -34,7 +34,7 @@ const Login = ({ navigation }) => {
 
     try {
       const res = await fetch(
-        "https://bookapp-70mc.onrender.com/api/login",
+        "http://10.0.2.2:3000/api/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -58,7 +58,7 @@ const Login = ({ navigation }) => {
         navigation.navigate("Home");
         return;
       }
-
+      
       // ❌ ERROR อื่น
       alert(data.message || "เข้าสู่ระบบไม่สำเร็จ");
     } catch (err) {

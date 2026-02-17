@@ -11,6 +11,9 @@ npm audit fix
 npm install react-native-pdf react-native-blob-util
 npx expo install react-native-webview
 
+http://10.0.2.2:3000/
+https://bookapp-70mc.onrender.com/api
+
 
 //ตอนรัน ต้องใช้ 2 terminal 
 1.node server.js

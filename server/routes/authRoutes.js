@@ -44,14 +44,12 @@ router.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
     });
-    const data = await res.json();r
-    if (res.ok) {
-      alert("สมัครสมาชิกคนดำสำเร็จ");
-      navigation.navigate("Login");
-      console.log("Register Complete");
-    } else {
-      alert(data.message || "สมัครไม่สำเร็จ");
-    }
+    console.log(user);
+  
+    res.status(201).json({
+      message: "Register success. Please verify OTP",
+      userId: user._id,
+    });
   } catch (err) {
     console.error("REGISTER ERROR:", err);
     res.status(500).json({

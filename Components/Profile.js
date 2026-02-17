@@ -58,7 +58,7 @@ const Profile = ({ navigation }) => {
       const token = await AsyncStorage.getItem("token");
       console.log("TOKEN:", token);
       const res = await fetch(
-        'https://bookapp-70mc.onrender.com/api/upload-profile-pic',
+        'http://10.0.2.2:3000/api/upload-profile-pic',
         {
           method: 'POST',
           headers: {
@@ -74,6 +74,7 @@ const Profile = ({ navigation }) => {
 
       if (res.ok) {
         Alert.alert('สำเร็จ', 'อัปโหลดรูปภาพเรียบร้อยแล้ว');
+        await fetchProfile();
         if (responseData.profilePic) {
           const fullUrl = responseData.profilePic.startsWith('http')
             ? responseData.profilePic
@@ -94,7 +95,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`https://bookapp-70mc.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`http://10.0.2.2:3000/api/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -109,7 +110,7 @@ const Profile = ({ navigation }) => {
       const token = await AsyncStorage.getItem("token");
 
       const res = await fetch(
-        'https://bookapp-70mc.onrender.com/api/profile',
+        'http://10.0.2.2:3000/api/profile',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -136,13 +137,7 @@ const Profile = ({ navigation }) => {
     }
   };
   useEffect(() => {
-    fetchProfile(); // โหลดครั้งแรก
-
-    const interval = setInterval(() => {
-      fetchProfile(); // โหลดซ้ำทุก 5 วิ
-    }, 5000);
-
-    return () => clearInterval(interval); // ป้องกัน memory leak
+    fetchProfile();
   }, []);
 
   return (

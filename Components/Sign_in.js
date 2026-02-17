@@ -18,7 +18,7 @@ const Sign_in = ({ navigation }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
-const handleRegister = async () => {
+  const handleRegister = async () => {
     console.log(email, password, confirmPassword);
 
     // 1. Check for empty fields
@@ -42,13 +42,21 @@ const handleRegister = async () => {
     }
 
     try {
-      const res = await fetch("https://bookapp-70mc.onrender.com/api/register", {
+      const res = await fetch("http://10.0.2.2:3000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
+      const data = await res.json();
+      if (res.ok) {
+        alert("สมัครสมาชิกคนดำสำเร็จ");
+        navigation.navigate("Login");
+        console.log("Register Complete");
+      } else {
+        alert(data.message || "สมัครไม่สำเร็จ");
+      }
     } catch (err) {
       alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
     }
