@@ -7,19 +7,15 @@ const AddbyCode = ({ navigation }) => {
   const [bookCode, setBookCode] = useState('');
 
   const handleAddBook = async () => {
-    const token = await AsyncStorage.getItem("token");
     if (bookCode.trim() === "") {
       Alert.alert("ข้อผิดพลาด", "กรุณากรอกรหัสหนังสือ");
       return;
     }
 
     try {
-      const res = await fetch('https://bookapp-h41h.onrender.com/api/add-by-code', {
+      const res = await fetch('http://10.0.2.2:3000/api/add-by-code', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ code: bookCode.trim() }),
       });
@@ -31,11 +27,11 @@ const AddbyCode = ({ navigation }) => {
       try {
         data = JSON.parse(text);
         console.log(data);
-
+        
       } catch { }
 
       if (!res.ok) {
-        Alert.alert("ไม่สำเร็จ2", data?.message || "เพิ่มหนังสือไม่สำเร็จ");
+        Alert.alert("ไม่สำเร็จ", data?.message || "เพิ่มหนังสือไม่สำเร็จ");
         return;
       }
 
@@ -44,7 +40,7 @@ const AddbyCode = ({ navigation }) => {
     } catch (err) {
       console.log("ADD BOOK ERROR:", err);
       Alert.alert("ผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-    }
+    } 
   };
 
 
