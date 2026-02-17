@@ -6,6 +6,7 @@ const auth = require("../middlewares/auth");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Book = require("../models/Book");
 const uploadToCloudinary = require("../utils/uploadToCloudinary");
 // ✅ import logout มาด้วย
 const isAuth = (req, res, next) => {
