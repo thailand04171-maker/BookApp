@@ -117,13 +117,6 @@ const Login = ({ navigation }) => {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {/* DEV MODE */}
-        <TouchableOpacity
-          style={styles.devButton}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={styles.devButtonText}>GUEST</Text>
-        </TouchableOpacity>
       </View>
     </ImageBackground>
   );

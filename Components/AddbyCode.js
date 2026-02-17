@@ -7,6 +7,7 @@ const AddbyCode = ({ navigation }) => {
   const [bookCode, setBookCode] = useState('');
 
   const handleAddBook = async () => {
+    const token = await AsyncStorage.getItem("token");
     if (bookCode.trim() === "") {
       Alert.alert("ข้อผิดพลาด", "กรุณากรอกรหัสหนังสือ");
       return;
@@ -15,7 +16,10 @@ const AddbyCode = ({ navigation }) => {
     try {
       const res = await fetch('https://bookapp-h41h.onrender.com/api/add-by-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         credentials: 'include',
         body: JSON.stringify({ code: bookCode.trim() }),
       });
@@ -27,7 +31,7 @@ const AddbyCode = ({ navigation }) => {
       try {
         data = JSON.parse(text);
         console.log(data);
-        
+
       } catch { }
 
       if (!res.ok) {
@@ -40,7 +44,7 @@ const AddbyCode = ({ navigation }) => {
     } catch (err) {
       console.log("ADD BOOK ERROR:", err);
       Alert.alert("ผิดพลาด", "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-    } 
+    }
   };
 
 

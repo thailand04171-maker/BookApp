@@ -10,9 +10,21 @@ const Book = require("../models/Book");
 const uploadToCloudinary = require("../utils/uploadToCloudinary");
 // ✅ import logout มาด้วย
 const isAuth = (req, res, next) => {
-  console.log('SESSION USER:', req.session.user);
+  const authHeader = req.headers.authorization;
+  const token = authHeader.split(" ")[1];
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
   if (!req.session?.user) {
     return res.status(401).json({ message: 'Unauthorized' });
+  }
+  console.log('SESSION USER:', req.session.user);
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ message: 'Invalid token' });
   }
   next();
 };
@@ -46,7 +58,7 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
     console.log(user);
-  
+
     res.status(201).json({
       message: "Register success. Please verify OTP",
       userId: user._id,
@@ -149,7 +161,7 @@ router.get('/profile', isAuth, async (req, res) => {
   }
 });
 
-router.post('/add-by-code', async (req, res) => {
+router.post('/add-by-code', isAuth, async (req, res) => {
   console.log("Enter add");
   try {
     const userId = req.session?.user?.id; // 🔥 เอาขึ้นบนสุด
