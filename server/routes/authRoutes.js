@@ -149,7 +149,7 @@ router.get('/profile', isAuth, async (req, res) => {
   }
 });
 
-router.post('/add-by-code', isAuth, async (req, res) => {
+router.post('/add-by-code', async (req, res) => {
   console.log("Enter add");
   try {
     const userId = req.session?.user?.id; // 🔥 เอาขึ้นบนสุด

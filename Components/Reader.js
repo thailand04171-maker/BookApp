@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground
 import { StatusBar } from 'expo-status-bar';
 import { WebView } from 'react-native-webview'; // 🔥 ต้องติดตั้ง: npx expo install react-native-webview
 
-const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'};
+const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 
 const Reader = ({ route, navigation }) => {
   const { title, pdfUrl } = route.params || { title: "กำลังอ่าน...", pdfUrl: null };
@@ -15,15 +15,15 @@ const Reader = ({ route, navigation }) => {
       <View style={styles.darkOverlay}>
         <SafeAreaView style={styles.safeArea}>
           <StatusBar style="light" />
-          
+
           {/* Header Bar - ดีไซน์แบบโปร่งแสง */}
           <View style={styles.header}>
-            <TouchableOpacity 
-                onPress={() => navigation.goBack()} 
-                style={styles.closeBtn}
-                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} // เพิ่มพื้นที่กดรอบๆ ปุ่ม
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.closeBtn}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} // เพิ่มพื้นที่กดรอบๆ ปุ่ม
             >
-                <Text style={styles.closeBtnText}>✕</Text>
+              <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>
             <View style={styles.titleContainer}>
               <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
@@ -37,19 +37,25 @@ const Reader = ({ route, navigation }) => {
           <View style={styles.pdfContainer}>
             {pdfUrl ? (
               <WebView
-                source={{ 
-                  uri: Platform.OS === 'android' 
+                key={pdfUrl}   // ⭐ บังคับให้สร้างใหม่ทุกครั้งที่ url เปลี่ยน
+                source={{
+                  uri: Platform.OS === 'android'
                     ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`
-                    : pdfUrl 
+                    : pdfUrl
                 }}
-                style={{ flex: 1, backgroundColor: 'transparent' }}
+                style={{ flex: 1 }}
+                cacheEnabled={false}
+                incognito={true}
                 startInLoadingState={true}
-                renderLoading={() => <ActivityIndicator size="large" color="#D32F2F" style={{marginTop: 20}} />}
+                renderLoading={() => (
+                  <ActivityIndicator size="large" color="#D32F2F" style={{ marginTop: 20 }} />
+                )}
               />
+
             ) : (
               <View style={styles.centerMsg}>
                 <Text style={styles.errorText}>ไม่พบไฟล์ PDF หรือกำลังโหลด...</Text>
-                <ActivityIndicator size="large" color="#D32F2F" style={{marginTop: 20}} />
+                <ActivityIndicator size="large" color="#D32F2F" style={{ marginTop: 20 }} />
               </View>
             )}
           </View>
@@ -62,7 +68,7 @@ const Reader = ({ route, navigation }) => {
             </View>
             <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>▶</Text></TouchableOpacity>
           </View>
-          
+
         </SafeAreaView>
       </View>
     </ImageBackground>
@@ -73,11 +79,11 @@ const styles = StyleSheet.create({
   background: { flex: 1 },
   darkOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)' }, // ปรับให้เข้มเพื่อให้อ่านง่าย
   safeArea: { flex: 1 },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    paddingHorizontal: 20, 
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
     height: 60,
     borderBottomWidth: 0.5,
     borderBottomColor: 'rgba(255,255,255,0.2)'
@@ -92,14 +98,14 @@ const styles = StyleSheet.create({
   readArea: { padding: 25, paddingBottom: 100 },
   pageTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 10 },
   textUnderline: { height: 3, width: 60, backgroundColor: '#D32F2F', marginBottom: 25 }, // เส้นสีแดงเอกลักษณ์ของแอปเรา
-  bookContent: { 
-    fontSize: 19, 
-    lineHeight: 32, 
-    color: '#E0E0E0', 
+  bookContent: {
+    fontSize: 19,
+    lineHeight: 32,
+    color: '#E0E0E0',
     textAlign: 'justify',
     letterSpacing: 0.5
   },
-  bottomControl: { 
+  bottomControl: {
     position: 'absolute',
     bottom: 30,
     left: 20,

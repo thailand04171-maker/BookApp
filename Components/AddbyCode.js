@@ -31,7 +31,7 @@ const AddbyCode = ({ navigation }) => {
       } catch { }
 
       if (!res.ok) {
-        Alert.alert("ไม่สำเร็จ", data?.message || "เพิ่มหนังสือไม่สำเร็จ");
+        Alert.alert("ไม่สำเร็จ2", data?.message || "เพิ่มหนังสือไม่สำเร็จ");
         return;
       }
 
