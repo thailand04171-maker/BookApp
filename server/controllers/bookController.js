@@ -50,8 +50,13 @@ exports.addBookByCode = async (req, res) => {
 exports.getMyBooks = async (req, res) => {
   try {
     const userId = req.session.user.id;
+
     const books = await BookCode.find({ user: userId })
-      .select('bookId bookTitle usedAt');
+      .populate({
+        path: 'bookId',
+        select: 'title pdfFile coverImage'
+      })
+      .select('bookTitle used bookId');
 
     res.json(books);
   } catch (err) {

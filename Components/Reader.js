@@ -7,9 +7,6 @@ const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-boo
 
 const Reader = ({ route, navigation }) => {
   const { title, pdfUrl } = route.params || { title: "กำลังอ่าน...", pdfUrl: null };
-  const [totalPage, setTotalPage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-
   return (
     <ImageBackground source={bgImage} style={styles.background}>
       <View style={styles.darkOverlay}>
