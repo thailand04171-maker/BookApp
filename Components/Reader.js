@@ -3,11 +3,17 @@ import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground
 import { StatusBar } from 'expo-status-bar';
 import { WebView } from 'react-native-webview'; // 🔥 ต้องติดตั้ง: npx expo install react-native-webview
 import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 
 const Reader = ({ route, navigation }) => {
+  const [refreshKey, setRefreshKey] = useState(0);
   const { title, pdfUrl } = route.params || { title: "กำลังอ่าน...", pdfUrl: null };
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
   return (
+
     <ImageBackground source={bgImage} style={styles.background}>
       <View style={styles.darkOverlay}>
         <SafeAreaView style={styles.safeArea}>
@@ -25,13 +31,19 @@ const Reader = ({ route, navigation }) => {
             <View style={styles.titleContainer}>
               <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
             </View>
+            <TouchableOpacity
+              onPress={handleRefresh}
+              style={styles.refreshBtn}
+            >
+              <FontAwesome name="refresh" size={24} color="#fff" />
+            </TouchableOpacity>
           </View>
 
           {/* Book Content - ตัวอักษรสีขาวบนพื้นหลังเข้ม */}
           <View style={styles.pdfContainer}>
             {pdfUrl ? (
               <WebView
-                key={pdfUrl}
+                key={`${pdfUrl}-${refreshKey}`}   // 👈 สำคัญมาก
                 source={{
                   uri: Platform.OS === 'android'
                     ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`
@@ -39,8 +51,9 @@ const Reader = ({ route, navigation }) => {
                 }}
                 style={{ flex: 1 }}
                 cacheEnabled={false}
-                sharedCookiesEnabled={true}
-                thirdPartyCookiesEnabled={true}
+                incognito={true}                // 👈 ลดปัญหา session ค้าง
+                sharedCookiesEnabled={false}
+                thirdPartyCookiesEnabled={false}
                 startInLoadingState={true}
                 renderLoading={() => (
                   <ActivityIndicator size="large" color="#D32F2F" style={{ marginTop: 20 }} />
@@ -75,6 +88,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  refreshBtn: {
+    padding: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
   },
   closeBtn: {
     padding: 8,
