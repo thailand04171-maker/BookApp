@@ -114,16 +114,7 @@ const Sign_in = ({ navigation }) => {
                 <Text style={styles.signupButtonText}>Sign up</Text>
               </TouchableOpacity>
 
-              <Text style={styles.orText}>or Sign in with</Text>
-
-              <View style={styles.socialButtonsContainer}>
-                <TouchableOpacity style={styles.socialButton}>
-                  <Image source={googleIcon} style={styles.socialIcon} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.socialButton}>
-                  <Image source={facebookIcon} style={styles.socialIcon} />
-                </TouchableOpacity>
-              </View>
+              <View style={styles.systemLine} />
 
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <Text style={styles.loginLink}>Already have an Account? Log in</Text>
@@ -140,6 +131,11 @@ const Sign_in = ({ navigation }) => {
 const styles = StyleSheet.create({
   background: {
     flex: 1
+  },
+  systemLine: {
+    height: 2,
+    backgroundColor: '#ffffff',
+    margin:20
   },
   overlay: {
     flex: 1,

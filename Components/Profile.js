@@ -2,15 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 const API_BASE = 'https://bookapp-h41h.onrender.com/api';
 const SERVER_URL = 'http://10.0.2.2:3000/';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const Profile = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [bookCount, setBookCount] = useState(0);
   const [profileImage, setProfileImage] = useState('https://via.placeholder.com/150');
   const [uploading, setUploading] = useState(false);
+  const handleRefresh = async () => {
+    try {
+      setUploading(true); // ใช้ loading เดิมไปเลย
+
+      await fetchProfile();   // 🔥 ดึงข้อมูลใหม่
+
+      Alert.alert("สำเร็จ", "รีเฟรชข้อมูลเรียบร้อย");
+    } catch (err) {
+      Alert.alert("Error", "รีเฟรชไม่สำเร็จ");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handlePickImage = async () => {
     // 1. Better status check logic
@@ -136,10 +152,11 @@ const Profile = ({ navigation }) => {
       console.log("Fetch Profile Error:", err.message);
     }
   };
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();   // รีเฟรชทุกครั้งที่เข้าหน้านี้
+    }, [])
+  );
   return (
     <ImageBackground source={bgImage} style={styles.background}>
       <View style={styles.overlay}>
@@ -173,8 +190,17 @@ const Profile = ({ navigation }) => {
           </TouchableOpacity>
 
           <View style={styles.infoBox}>
-            <Text style={styles.emailLabel}>{email || "Loading..."}</Text>
+            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Text style={styles.emailLabel}>{email || "Loading..."}</Text>
+              <TouchableOpacity
+                onPress={handleRefresh}
+              >
+                <FontAwesome name="refresh" size={24} color="black" />
+              </TouchableOpacity>
+
+            </View>
             <Text style={styles.bookLabel}>Books owned: {bookCount}</Text>
+
 
             <TouchableOpacity style={[styles.editBtn, styles.logoutBtn]} onPress={handleLogout}>
               <Text style={styles.btnText}>ออกจากระบบ</Text>
@@ -236,7 +262,7 @@ const styles = StyleSheet.create({
   bookLabel: { fontSize: 16, color: '#666', marginBottom: 25 },
   editBtn: { backgroundColor: '#444', height: 55, borderRadius: 12, marginTop: 10, justifyContent: 'center', alignItems: 'center' },
   logoutBtn: { backgroundColor: '#D32F2F' },
-  btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 }
+  btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });
 
 export default Profile; 

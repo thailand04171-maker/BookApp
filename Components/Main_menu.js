@@ -122,7 +122,7 @@ const Main_menu = ({ navigation }) => {
 const styles = StyleSheet.create({
   background: { flex: 1 },
   overlay: { flex: 1, backgroundColor: 'rgba(255,255,255,0.7)' },
-  header: { backgroundColor: '#000', padding: 15, alignItems: 'center' },
+  header: { backgroundColor: '#000', padding: 15, alignItems: 'center' ,paddingTop: 45 },
   headerTitle: { color: '#fff', fontSize: 18 },
   scrollContent: { padding: 20 },
   title: { fontSize: 40, fontWeight: 'bold', marginBottom: 20 },

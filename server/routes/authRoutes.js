@@ -46,7 +46,7 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
     console.log(user);
-  
+
     res.status(201).json({
       message: "Register success. Please verify OTP",
       userId: user._id,
@@ -123,10 +123,9 @@ router.post("/logout", (req, res) => {
   });
 });
 router.get('/profile', isAuth, async (req, res) => {
-  console.log("Enter profile");
   try {
     console.log("📥 SESSION:", req.session);
-
+    console.log("Enter profile");
     if (!req.session || !req.session.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -149,7 +148,7 @@ router.get('/profile', isAuth, async (req, res) => {
   }
 });
 
-router.post('/add-by-code',isAuth, async (req, res) => {
+router.post('/add-by-code', isAuth, async (req, res) => {
   console.log("Enter add");
   try {
     const userId = req.session?.user?.id; // 🔥 เอาขึ้นบนสุด

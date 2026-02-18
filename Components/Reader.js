@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ImageBackground, Dimensions, ActivityIndicator, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { WebView } from 'react-native-webview'; // 🔥 ต้องติดตั้ง: npx expo install react-native-webview
-
+import AntDesign from '@expo/vector-icons/AntDesign';
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 
 const Reader = ({ route, navigation }) => {
@@ -23,14 +23,11 @@ const Reader = ({ route, navigation }) => {
               style={styles.closeBtn}
               hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} // เพิ่มพื้นที่กดรอบๆ ปุ่ม
             >
-              <Text style={styles.closeBtnText}>✕</Text>
+              <AntDesign name="close" size={26} color="#fff" />
             </TouchableOpacity>
             <View style={styles.titleContainer}>
               <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
             </View>
-            <TouchableOpacity style={styles.settingsBtn}>
-              <Text style={styles.settingsText}>Aa</Text>
-            </TouchableOpacity>
           </View>
 
           {/* Book Content - ตัวอักษรสีขาวบนพื้นหลังเข้ม */}
@@ -60,14 +57,6 @@ const Reader = ({ route, navigation }) => {
             )}
           </View>
 
-          {/* Bottom Control - ดีไซน์แบบลอย (Floating) */}
-          <View style={styles.bottomControl}>
-            <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>◀</Text></TouchableOpacity>
-            <View style={styles.pageIndicatorContainer}>
-              <Text style={styles.pageIndicatorText}>PDF Viewer</Text>
-            </View>
-            <TouchableOpacity style={styles.navIcon}><Text style={styles.navIconText}>▶</Text></TouchableOpacity>
-          </View>
 
         </SafeAreaView>
       </View>
@@ -80,15 +69,21 @@ const styles = StyleSheet.create({
   darkOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)' }, // ปรับให้เข้มเพื่อให้อ่านง่าย
   safeArea: { flex: 1 },
   header: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    right: 20,
+    zIndex: 20,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    height: 60,
-    borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255,255,255,0.2)'
+    alignItems: 'center',
   },
-  closeBtn: { padding: 5 },
+  closeBtn: {
+    padding: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
+    zIndex: 10
+  },
   closeBtnText: { color: '#fff', fontSize: 24 },
   titleContainer: { width: '60%' },
   headerTitle: { color: '#ccc', fontSize: 14, textAlign: 'center', fontWeight: '500' },
@@ -107,6 +102,7 @@ const styles = StyleSheet.create({
   },
   bottomControl: {
     position: 'absolute',
+    marginTop: 15,
     bottom: 30,
     left: 20,
     right: 20,

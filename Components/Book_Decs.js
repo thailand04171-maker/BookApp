@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity, ScrollView } from 'react-native';
 
-const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg'};
+const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 
 const Book_Decs = ({ route, navigation }) => {
   // รับข้อมูลหนังสือจากหน้าที่กดมา (ถ้ามี)
-  const { title, image, description, pdfUrl } = route.params || { 
-    title: "Morning Glory Flowers", 
+  const { title, image, description, pdfUrl } = route.params || {
+    title: "Morning Glory Flowers",
     image: 'https://via.placeholder.com/250x350',
     description: "ไม่มีรายละเอียด",
     pdfUrl: null
@@ -32,10 +32,9 @@ const Book_Decs = ({ route, navigation }) => {
           {/* Book Info */}
           <View style={styles.infoSection}>
             <Text style={styles.bookTitle}>{title}</Text>
-            <Text style={styles.authorText}>โดย: National Diet Library</Text>
-            
+
             <View style={styles.divider} />
-            
+
             <Text style={styles.descriptionTitle}>เรื่องย่อ</Text>
             <Text style={styles.descriptionText}>
               {description}
@@ -44,12 +43,12 @@ const Book_Decs = ({ route, navigation }) => {
 
           {/* Read Button */}
           {pdfUrl && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.readButton}
               onPress={() => navigation.navigate('Reader', { title: title, pdfUrl: pdfUrl })} // ส่ง pdfUrl ไปหน้า Reader
-              >
+            >
               <Text style={styles.readButtonText}>อ่าน E-book</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
           )}
         </ScrollView>
       </View>
@@ -79,15 +78,15 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: '#ccc', marginVertical: 15 },
   descriptionTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   descriptionText: { fontSize: 16, color: '#444', lineHeight: 24 },
-  readButton: { 
-    backgroundColor: '#D32F2F', 
-    width: '100%', 
-    height: 55, 
-    borderRadius: 30, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+  readButton: {
+    backgroundColor: '#D32F2F',
+    width: '100%',
+    height: 55,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 30,
-    marginBottom: 50 
+    marginBottom: 50
   },
   readButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }
 });
