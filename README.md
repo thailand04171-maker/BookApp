@@ -14,6 +14,7 @@ npx expo install react-native-webview
 http://10.0.2.2:3000/
 https://bookapp-70mc.onrender.com/api 
 https://bookapp-h41h.onrender.com/api
+https://bookapp-wgle.onrender.com/api
 
 
 //ตอนรัน ต้องใช้ 2 terminal 

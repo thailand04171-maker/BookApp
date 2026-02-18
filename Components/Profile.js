@@ -6,7 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
 const API_BASE = 'https://bookapp-h41h.onrender.com/api';
-const SERVER_URL = 'http://10.0.2.2:3000/';
+const SERVER_URL = 'https://bookapp-wgle.onrender.com/';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const Profile = ({ navigation }) => {
@@ -74,7 +74,7 @@ const Profile = ({ navigation }) => {
       const token = await AsyncStorage.getItem("token");
       console.log("TOKEN:", token);
       const res = await fetch(
-        'http://10.0.2.2:3000/api/upload-profile-pic',
+        'https://bookapp-wgle.onrender.com/api/upload-profile-pic',
         {
           method: 'POST',
           headers: {
@@ -111,7 +111,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       // Note: Added timeout or error handling for network issues
-      const res = await fetch(`http://10.0.2.2:3000/api/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`https://bookapp-wgle.onrender.com/api/logout`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
       } else {
@@ -126,7 +126,7 @@ const Profile = ({ navigation }) => {
       const token = await AsyncStorage.getItem("token");
 
       const res = await fetch(
-        'http://10.0.2.2:3000/api/profile',
+        'https://bookapp-wgle.onrender.com/api/profile',
         {
           headers: {
             Authorization: `Bearer ${token}`,
