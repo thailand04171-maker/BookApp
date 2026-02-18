@@ -31,7 +31,7 @@ const Reader = ({ route, navigation }) => {
           <View style={styles.pdfContainer}>
             {pdfUrl ? (
               <WebView
-                key={pdfUrl}   // ⭐ บังคับให้สร้างใหม่ทุกครั้งที่ url เปลี่ยน
+                key={pdfUrl}
                 source={{
                   uri: Platform.OS === 'android'
                     ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`
@@ -39,7 +39,8 @@ const Reader = ({ route, navigation }) => {
                 }}
                 style={{ flex: 1 }}
                 cacheEnabled={false}
-                incognito={true}
+                sharedCookiesEnabled={true}
+                thirdPartyCookiesEnabled={true}
                 startInLoadingState={true}
                 renderLoading={() => (
                   <ActivityIndicator size="large" color="#D32F2F" style={{ marginTop: 20 }} />
