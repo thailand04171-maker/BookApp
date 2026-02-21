@@ -1,15 +1,10 @@
 // Sign_in.js (Register Screen)
-//D:\ApiwatSpice\3term2\StartUp\TONTAN\BookApp\Components\Sign_in.js
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ImageBackground, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons'; 
 
-// Replace with your actual assets
 const bgImage = { uri: 'https://w0.peakpx.com/wallpaper/717/357/HD-wallpaper-books-phone-library.jpg' };
-const googleIcon = { uri: 'https://via.placeholder.com/30/ffffff/000000?text=G' };
-const facebookIcon = { uri: 'https://via.placeholder.com/30/ffffff/000000?text=F' };
-const eyeOpenIcon = { uri: 'https://via.placeholder.com/20/000000/ffffff?text=O' };
-const eyeClosedIcon = { uri: 'https://via.placeholder.com/20/000000/ffffff?text=C' };
 
 const Sign_in = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -17,29 +12,41 @@ const Sign_in = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
 
   const handleRegister = async () => {
-    console.log(email, password, confirmPassword);
-
-    // 1. Check for empty fields
+    // 1. เช็กช่องว่าง
     if (!email || !password || !confirmPassword) {
-      alert("กรอกข้อมูลให้ครบ");
+      Alert.alert("ข้อผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
 
-    // 2. Email Validation (Regex)
+    // 2. เช็กรูปแบบอีเมล
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert("รูปแบบอีเมลไม่ถูกต้อง กรุณากรอกใหม่อีกครั้ง");
-      setEmail(''); // Clear the email input box
+      Alert.alert("ข้อผิดพลาด", "รูปแบบอีเมลไม่ถูกต้อง กรุณากรอกใหม่อีกครั้ง");
+      setEmail(''); 
       return;
     }
 
-    // 3. Password Match Check
-    if (password !== confirmPassword) {
-      alert("รหัสผ่านไม่ตรงกัน");
+    // 3. ตรวจสอบความปลอดภัยของรหัสผ่าน (Password Validation)
+    // เงื่อนไข: ยาว 8 ตัวอักษรขึ้นไป, มีตัวพิมพ์เล็ก, ตัวพิมพ์ใหญ่ และตัวเลข
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      Alert.alert(
+        "รหัสผ่านไม่ปลอดภัย",
+        "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร และประกอบด้วยตัวพิมพ์เล็ก (a-z) ตัวพิมพ์ใหญ่ (A-Z) และตัวเลข (0-9) อย่างน้อย 1 ตัว"
+      );
       return;
     }
+
+    // 4. เช็กรหัสผ่านและการยืนยันรหัสผ่านว่าตรงกันหรือไม่
+    if (password !== confirmPassword) {
+      Alert.alert("ข้อผิดพลาด", "รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const res = await fetch("https://bookapp-wgle.onrender.com/api/register", {
@@ -49,16 +56,19 @@ const Sign_in = ({ navigation }) => {
         },
         body: JSON.stringify({ email, password }),
       });
+      
       const data = await res.json();
+      
       if (res.ok) {
-        alert("สมัครสมาชิกคนดำสำเร็จ");
+        Alert.alert("สำเร็จ", "สมัครสมาชิกสำเร็จ"); 
         navigation.navigate("Login");
-        console.log("Register Complete");
       } else {
-        alert(data.message || "สมัครไม่สำเร็จ");
+        Alert.alert("ข้อผิดพลาด", data.message || "สมัครไม่สำเร็จ");
       }
     } catch (err) {
-      alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+      Alert.alert("ข้อผิดพลาด", "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -77,7 +87,7 @@ const Sign_in = ({ navigation }) => {
               <Text style={styles.label}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder=""
+                placeholder="example@mail.com"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -91,9 +101,10 @@ const Sign_in = ({ navigation }) => {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!isPasswordVisible}
+                  autoCapitalize="none"
                 />
                 <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
-                  <Image source={isPasswordVisible ? eyeOpenIcon : eyeClosedIcon} style={styles.iconImage} />
+                  <Ionicons name={isPasswordVisible ? "eye-off" : "eye"} size={24} color="gray" />
                 </TouchableOpacity>
               </View>
 
@@ -104,14 +115,23 @@ const Sign_in = ({ navigation }) => {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!isConfirmPasswordVisible}
+                  autoCapitalize="none"
                 />
                 <TouchableOpacity onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} style={styles.eyeIcon}>
-                  <Image source={isConfirmPasswordVisible ? eyeOpenIcon : eyeClosedIcon} style={styles.iconImage} />
+                  <Ionicons name={isConfirmPasswordVisible ? "eye-off" : "eye"} size={24} color="gray" />
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.signupButton} onPress={handleRegister}>
-                <Text style={styles.signupButtonText}>Sign up</Text>
+              <TouchableOpacity 
+                style={[styles.signupButton, isLoading && styles.signupButtonDisabled]} 
+                onPress={handleRegister}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.signupButtonText}>Sign up</Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.systemLine} />
@@ -127,7 +147,6 @@ const Sign_in = ({ navigation }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   background: {
     flex: 1
@@ -135,7 +154,7 @@ const styles = StyleSheet.create({
   systemLine: {
     height: 2,
     backgroundColor: '#ffffff',
-    margin:20
+    margin: 20
   },
   overlay: {
     flex: 1,
@@ -150,13 +169,9 @@ const styles = StyleSheet.create({
   passwordContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 25, height: 50, paddingHorizontal: 20, marginBottom: 15 },
   passwordInput: { flex: 1, height: 50 },
   eyeIcon: { padding: 10 },
-  iconImage: { width: 24, height: 24, resizeMode: 'contain' },
   signupButton: { backgroundColor: '#D32F2F', borderRadius: 25, height: 50, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
+  signupButtonDisabled: { backgroundColor: '#e57373' }, 
   signupButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  orText: { color: '#fff', textAlign: 'center', marginVertical: 20 },
-  socialButtonsContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
-  socialButton: { backgroundColor: '#fff', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginHorizontal: 10 },
-  socialIcon: { width: 30, height: 30, resizeMode: 'contain' },
   loginLink: { color: '#fff', textAlign: 'center', marginTop: 10 },
 });
 
